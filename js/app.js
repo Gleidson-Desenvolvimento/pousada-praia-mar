@@ -11,6 +11,14 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const waLink = (t) => `https://wa.me/${P.whatsapp}?text=${encodeURIComponent(t)}`;
   const localKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  // temporadas com preço fixo ainda por vir (ex.: Réveillon, janeiro)
+  const temporadasNota = () => {
+    const hoje = localKey(new Date());
+    const fmt = (k) => new Date(k + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+    const ts = (C.temporadas || []).filter((t) => t.preco && t.inicio.length > 5 && t.fim >= hoje);
+    if (!ts.length) return "";
+    return `<p class="kids-note">📅 ${ts.map((t) => `${esc(t.nome)} (${fmt(t.inicio)} a ${fmt(t.fim)}): ${brl(t.preco)} por pessoa/noite${t.minNoites > 1 ? `, mín. ${t.minNoites} diárias` : ""}`).join(" · ")}</p>`;
+  };
 
   /* ---------------- toast ---------------- */
   let toastT;
@@ -181,6 +189,7 @@
           <ul class="amen">${q.comodidades.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
           <p class="price" style="font-size:24px">${brl(q.preco)}<small> por pessoa/noite, com café da manhã</small></p>
           <p class="kids-note">👶 Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam</p>
+          ${temporadasNota()}
           <button class="btn btn--coral btn--lg" data-open-booking data-room="${q.id}">Reservar ${esc(q.nome)}</button>
         </div>
       </div>`;
@@ -353,11 +362,13 @@
      ATENDIMENTO "MARÉ" — respostas sobre a pousada e sobre Caraíva
      ===================================================================== */
   const precos = C.quartos.map((q) => `• ${q.nome}: ${brl(q.preco)} por pessoa/noite (até ${q.capacidade} pessoas)`).join("\n");
-  const validade = C.tarifaValidaAte ? new Date(C.tarifaValidaAte + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : "";
+  const ddmm = (k) => new Date(k + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  const validade = C.tarifaValidaAte ? ddmm(C.tarifaValidaAte) : "";
+  const temporadasTxt = (C.temporadas || []).filter((t) => t.preco && t.inicio.length > 5).map((t) => `• ${t.nome} (${ddmm(t.inicio)} a ${ddmm(t.fim)}): ${brl(t.preco)} por pessoa/noite${t.minNoites > 1 ? `, mínimo de ${t.minNoites} diárias` : ""}`).join("\n");
   const kb = [
     { k: ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "e ai"], r: "Oi! Que bom te ver por aqui 🌊 Quer saber sobre quartos, preços, como chegar em Caraíva ou já quer reservar?" },
     { k: ["quarto", "acomoda", "suite", "suíte", "chale", "chalé", "dossel"], r: `Temos ${C.quartos.length} acomodações, todas com café da manhã incluso:\n${precos}\nQuer ver a disponibilidade para as suas datas?`, a: "booking" },
-    { k: ["preco", "preço", "valor", "quanto", "custa", "diaria", "diária", "tarifa"], r: `As diárias são cobradas por pessoa e já incluem o café da manhã. Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam:\n${precos}${validade ? `\nEsses valores valem até ${validade}. Para datas depois disso (Réveillon, janeiro…), consulte a gente no WhatsApp.` : ""}`, a: "booking" },
+    { k: ["preco", "preço", "valor", "quanto", "custa", "diaria", "diária", "tarifa"], r: `As diárias são cobradas por pessoa e já incluem o café da manhã. Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam:\n${precos}${validade ? `\nEsses valores valem até ${validade}.` : ""}${temporadasTxt ? `\nTemporadas (todos os quartos):\n${temporadasTxt}` : ""}\nPara outras datas, consulte a gente no WhatsApp.`, a: "booking" },
     { k: ["chegar", "chego", "aeroporto", "travessia", "canoa", "estrada", "carro", "estacion", "transfer", "porto seguro", "trancoso", "onibus", "ônibus"], r: "Caraíva fica a cerca de 70 km (≈2h30) do aeroporto de Porto Seguro, com um trecho de estrada de terra. Carros não entram na vila: você estaciona em Nova Caraíva e atravessa o rio de canoa — são poucos minutos. As malas seguem de carroça pelas ruas de areia 🛶\nA pousada fica na Aldeia Xandó, R. Pedro Marcelino, no coração de Caraíva. Oferecemos transfer do aeroporto como extra na reserva.", a: "map" },
     { k: ["endereco", "endereço", "onde fica", "localiza", "mapa", "xando", "xandó"], r: `Estamos na ${P.endereco}, no coração de Caraíva, a poucos passos da praia. Toque abaixo para abrir a rota no Google Maps 📍`, a: "map" },
     { k: ["check", "horario", "horário", "entrada", "saida", "saída"], r: `Check-in a partir das ${P.checkin} e check-out até as ${P.checkout}. Se chegar antes, guardamos suas malas e você já pode curtir a praia.` },

@@ -206,20 +206,25 @@ window.PM_CONFIG = {
   ],
 
   /* ---------------- TARIFA EM VIGOR -------------------------------------
-     Os preços acima valem para as noites até esta data (inclusive).
-     Noites depois dela aparecem como "consulte" no calendário e o hóspede
-     é levado ao WhatsApp. Quando tiver a nova tabela (Réveillon, janeiro…),
-     mude a data e/ou cadastre temporadas abaixo.                          */
+     O preço de cada quarto (acima) vale para as noites até esta data
+     (inclusive). Depois dela, só têm preço as noites que estiverem dentro
+     de alguma TEMPORADA (abaixo). Noites sem preço aparecem como "—" no
+     calendário e o hóspede é levado ao WhatsApp.                          */
   tarifaValidaAte: "2026-12-25",
 
   /* Crianças com até esta idade (inclusive) NÃO pagam diária.
      Elas continuam contando na capacidade do quarto (ocupam cama).       */
   criancaGratisAte: 10,
 
-  /* TEMPORADAS (opcional) — ex.:
-     { nome: "Réveillon", inicio: "12-27", fim: "01-02", multiplicador: 1.5, minNoites: 5 }
-     Datas "MM-DD" ou "AAAA-MM-DD". A primeira regra que bater vale.       */
-  temporadas: [],
+  /* TEMPORADAS — períodos com preço próprio.
+     inicio / fim = primeira e ÚLTIMA NOITE do período ("AAAA-MM-DD").
+     preco      = diária POR PESSOA com café, igual para todos os quartos
+     (ou use multiplicador: 1.5 para aplicar sobre o preço de cada quarto)
+     minNoites  = estadia mínima quando a reserva pega alguma noite do período */
+  temporadas: [
+    { nome: "Réveillon", inicio: "2026-12-27", fim: "2027-01-08", preco: 1300, minNoites: 3 },
+    { nome: "Janeiro", inicio: "2027-01-09", fim: "2027-01-31", preco: 500 },
+  ],
   minNoitesPadrao: 1,
 
   /* Datas já ocupadas (reservas feitas por fora: Booking, Airbnb, telefone)

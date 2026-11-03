@@ -42,11 +42,16 @@
     return null;
   }
   // preço POR PESSOA, por noite, com café da manhã
-  const nightRate = (room, d) => Math.round(room.preco * (seasonOf(d)?.multiplicador || 1));
-  // noites depois de tarifaValidaAte ainda não têm preço → "consulte"
+  const nightRate = (room, d) => {
+    const s = seasonOf(d);
+    if (s && s.preco) return s.preco;
+    return Math.round(room.preco * (s?.multiplicador || 1));
+  };
+  // noites sem preço definido (depois de tarifaValidaAte e fora de temporada) → "consulte"
   const LIMITE = C.tarifaValidaAte || null;
-  const priced = (d) => !LIMITE || key(d) <= LIMITE;
-  const limiteFmt = () => parse(LIMITE).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  const priced = (d) => !LIMITE || key(d) <= LIMITE || !!seasonOf(d);
+  const firstUnpriced = (ci, co) => { for (let d = new Date(ci); d < co; d = addDays(d, 1)) if (!priced(d)) return d; return null; };
+  const ddmm = (d) => d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 
   function minNightsFor(ci, co) {
     let min = C.minNoitesPadrao, why = null;
@@ -81,7 +86,13 @@
     const pessoas = s.adultos + s.criancas;   // ocupação do quarto
     const pagantes = s.adultos;               // crianças até KID_AGE anos não pagam
     let diarias = 0;
-    for (let d = new Date(s.checkin); d < s.checkout; d = addDays(d, 1)) diarias += nightRate(room, d) * pagantes;
+    const faixas = []; // [{ preco, noites, nome }] — noites agrupadas pelo valor
+    for (let d = new Date(s.checkin); d < s.checkout; d = addDays(d, 1)) {
+      const r = nightRate(room, d), nome = seasonOf(d)?.nome || "";
+      diarias += r * pagantes;
+      const f = faixas.find((x) => x.preco === r && x.nome === nome);
+      if (f) f.noites++; else faixas.push({ preco: r, noites: 1, nome });
+    }
     const extraPessoas = 0;
     const extras = C.extras.filter((e) => s.extras.has(e.id)).map((e) => ({ ...e, total: e.tipo === "pessoa" ? e.preco * pessoas : e.preco }));
     const extrasTotal = extras.reduce((a, e) => a + e.total, 0);
@@ -89,7 +100,7 @@
     const desconto = s.pagamento === "pix-total" ? Math.round(subtotal * C.pix.descontoPagamentoTotal * 100) / 100 : 0;
     const total = subtotal - desconto;
     const agora = s.pagamento === "pix-total" ? total : Math.round(total * C.sinal * 100) / 100;
-    return { room, n, pessoas, pagantes, criancas: s.criancas, diarias, extraPessoas, extras, subtotal, desconto, total, agora, restante: total - agora };
+    return { room, n, pessoas, pagantes, criancas: s.criancas, diarias, faixas, extraPessoas, extras, subtotal, desconto, total, agora, restante: total - agora };
   }
 
   /* ---------------- Pix (BR Code EMV) ---------------- */
@@ -150,7 +161,7 @@
       const co = state.checkout && key(state.checkout) === k;
       const inR = state.checkin && state.checkout && d > state.checkin && d < state.checkout;
       // check-out pode cair num dia lotado (a noite não é usada)
-      const canCheckout = state.checkin && !state.checkout && d > state.checkin && priced(addDays(d, -1));
+      const canCheckout = state.checkin && !state.checkout && d > state.checkin && !firstUnpriced(state.checkin, d);
       const hasPrice = priced(d);
       const disabled = past || ((!free || !hasPrice) && !canCheckout);
       const cls = ["cal__day", !past && !free ? "full" : "", seasonOf(d) ? "season" : "", +d === +t ? "today" : "", ci ? "start" : "", co ? "end" : "", inR ? "in" : ""].join(" ");
@@ -183,7 +194,7 @@
         <span><i style="background:var(--anil)"></i>Selecionado</span>
         ${C.temporadas.length ? `<span><i style="background:rgba(224,87,58,.25)"></i>Valor em vermelho = temporada especial</span>` : ""}
         <span><i style="background:#e9e0cf"></i>Riscado = lotado</span>
-        ${LIMITE ? `<span>“—” = valores ainda não abertos (após ${limiteFmt()}): <a href="${waLink("Olá! Gostaria de consultar valores e disponibilidade depois de " + limiteFmt() + ".")}" target="_blank" rel="noopener">consulte no WhatsApp</a></span>` : ""}
+        ${LIMITE ? `<span>“—” = valores ainda não abertos: <a href="${waLink("Olá! Gostaria de consultar valores e disponibilidade para datas que ainda não aparecem no site.")}" target="_blank" rel="noopener">consulte no WhatsApp</a></span>` : ""}
       </div>
       <div class="guests">
         <div class="guest-box"><div><b>Adultos</b><span>${KID_AGE + 1} anos ou mais</span></div>
@@ -203,9 +214,10 @@
     const n = nightsBetween(state.checkin, state.checkout);
     if (n < 1) return "A saída precisa ser depois da chegada.";
     if (n > MAX_NIGHTS) return `Para estadias acima de ${MAX_NIGHTS} noites, fale com a gente pelo WhatsApp.`;
-    if (LIMITE && !priced(addDays(state.checkout, -1))) {
+    const semPreco = LIMITE && firstUnpriced(state.checkin, state.checkout);
+    if (semPreco) {
       const msg = "Olá! Gostaria de consultar valores e disponibilidade de " + fmtShort(state.checkin) + " a " + fmtShort(state.checkout) + ".";
-      return `Os valores para noites depois de ${limiteFmt()} ainda não estão abertos no site. <a href="${waLink(msg)}" target="_blank" rel="noopener">Consulte essas datas no WhatsApp</a> — respondemos rapidinho.`;
+      return `O valor da noite de ${ddmm(semPreco)} ainda não está aberto no site. <a href="${waLink(msg)}" target="_blank" rel="noopener">Consulte essas datas no WhatsApp</a> — respondemos rapidinho.`;
     }
     const { min, why } = minNightsFor(state.checkin, state.checkout);
     if (n < min) return `Nesse período${why ? ` (${why})` : ""} a estadia mínima é de ${min} noites.`;
@@ -213,6 +225,11 @@
   }
 
   /* ---------- PASSO 2: quarto ---------- */
+  const rateLabel = (qq) => {
+    const v = qq.faixas.map((f) => f.preco);
+    const lo = Math.min(...v), hi = Math.max(...v);
+    return lo === hi ? brl(lo) : `${brl(lo)} a ${brl(hi)}`;
+  };
   function stepRoom() {
     const n = nightsBetween(state.checkin, state.checkout);
     const pessoas = state.adultos + state.criancas;
@@ -226,7 +243,7 @@
         <button type="button" class="pick-room ${state.quartoId === q.id ? "on" : ""}" data-room="${q.id}" ${ok ? "" : "disabled"}>
           <img src="${q.img}" alt="${esc(q.nome)}" />
           <div><h4>${esc(q.nome)}</h4><p>${esc(q.resumo)}</p>${badge}</div>
-          <div class="pick-room__price"><b>${brl(qq.diarias)}</b><span>${n} noite${n > 1 ? "s" : ""} · ${state.adultos} adulto${state.adultos > 1 ? "s" : ""}${state.criancas ? ` + ${state.criancas} criança${state.criancas > 1 ? "s" : ""} grátis` : ""}<br/>${brl(q.preco)} por pessoa/noite</span></div>
+          <div class="pick-room__price"><b>${brl(qq.diarias)}</b><span>${n} noite${n > 1 ? "s" : ""} · ${state.adultos} adulto${state.adultos > 1 ? "s" : ""}${state.criancas ? ` + ${state.criancas} criança${state.criancas > 1 ? "s" : ""} grátis` : ""}<br/>${rateLabel(qq)} por pessoa/noite</span></div>
         </button>`;
     }).join("");
     const none = C.quartos.every((q) => !(q.capacidade >= pessoas && rangeFree(q.id, state.checkin, state.checkout)));
@@ -522,7 +539,7 @@
       return;
     }
     const lines = [
-      `<li><span>${q.n} diária${q.n > 1 ? "s" : ""} × ${q.pagantes} adulto${q.pagantes > 1 ? "s" : ""} (${brl(q.room.preco)})</span><span>${brl(q.diarias)}</span></li>`,
+      ...q.faixas.map((f) => `<li><span>${f.noites} diária${f.noites > 1 ? "s" : ""}${f.nome ? ` ${esc(f.nome)}` : ""} × ${q.pagantes} adulto${q.pagantes > 1 ? "s" : ""} (${brl(f.preco)})</span><span>${brl(f.preco * f.noites * q.pagantes)}</span></li>`),
       q.criancas ? `<li class="disc"><span>${q.criancas} criança${q.criancas > 1 ? "s" : ""} até ${KID_AGE} anos</span><span>grátis</span></li>` : "",
       q.extraPessoas ? `<li><span>Hóspedes adicionais</span><span>${brl(q.extraPessoas)}</span></li>` : "",
       ...q.extras.map((e) => `<li><span>${esc(e.nome)}</span><span>${brl(e.total)}</span></li>`),

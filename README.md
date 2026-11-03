@@ -15,7 +15,7 @@ Para publicar, envie a pasta inteira para Netlify, Vercel, GitHub Pages, Hosting
 | Quartos (Baixú, Auê, Hahâu, Hayô, Maion, Angorró): fotos, camas, vista, capacidade, preço POR PESSOA | `quartos` |
 | Até quando os preços valem (datas depois aparecem como "consulte") | `tarifaValidaAte` |
 | Galeria em abas (Jardim, Sala de estar, Caraíva) | `galeria` |
-| Réveillon, Carnaval, alta temporada (preço e mínimo de noites) | `temporadas` |
+| Réveillon, janeiro, Carnaval… (preço por pessoa do período e mínimo de noites) | `temporadas` |
 | Datas já vendidas por fora (Booking, Airbnb, telefone) | `bloqueios` |
 | Extras (transfer, carroça, passeio…) | `extras` |
 | Nota do Google e link do perfil | `google` |
