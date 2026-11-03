@@ -699,3 +699,5 @@ input, select, textarea { font: inherit; color: inherit; }
   .g-slide { height: clamp(300px, 92vw, 440px); }
 }
 .room-card__img img { object-position: center 60%; }
+
+.kids-note { margin: -6px 0 0 !important; font-size: 13.5px !important; color: var(--mangue) !important; font-weight: 500; }

@@ -7,6 +7,7 @@
   const C = window.PM_CONFIG;
   const STORE_KEY = "pm_reservas";
   const MAX_NIGHTS = 30;
+  const KID_AGE = C.criancaGratisAte ?? 10; // crianças até essa idade não pagam
   const MAX_GUESTS = Math.max(...C.quartos.map((q) => q.capacidade));
 
   /* ---------------- utilidades ---------------- */
@@ -77,9 +78,10 @@
     const room = roomById(s.quartoId);
     if (!room || !s.checkin || !s.checkout) return null;
     const n = nightsBetween(s.checkin, s.checkout);
-    const pessoas = s.adultos + s.criancas;
+    const pessoas = s.adultos + s.criancas;   // ocupação do quarto
+    const pagantes = s.adultos;               // crianças até KID_AGE anos não pagam
     let diarias = 0;
-    for (let d = new Date(s.checkin); d < s.checkout; d = addDays(d, 1)) diarias += nightRate(room, d) * pessoas;
+    for (let d = new Date(s.checkin); d < s.checkout; d = addDays(d, 1)) diarias += nightRate(room, d) * pagantes;
     const extraPessoas = 0;
     const extras = C.extras.filter((e) => s.extras.has(e.id)).map((e) => ({ ...e, total: e.tipo === "pessoa" ? e.preco * pessoas : e.preco }));
     const extrasTotal = extras.reduce((a, e) => a + e.total, 0);
@@ -87,7 +89,7 @@
     const desconto = s.pagamento === "pix-total" ? Math.round(subtotal * C.pix.descontoPagamentoTotal * 100) / 100 : 0;
     const total = subtotal - desconto;
     const agora = s.pagamento === "pix-total" ? total : Math.round(total * C.sinal * 100) / 100;
-    return { room, n, pessoas, diarias, extraPessoas, extras, subtotal, desconto, total, agora, restante: total - agora };
+    return { room, n, pessoas, pagantes, criancas: s.criancas, diarias, extraPessoas, extras, subtotal, desconto, total, agora, restante: total - agora };
   }
 
   /* ---------------- Pix (BR Code EMV) ---------------- */
@@ -184,9 +186,9 @@
         ${LIMITE ? `<span>“—” = valores ainda não abertos (após ${limiteFmt()}): <a href="${waLink("Olá! Gostaria de consultar valores e disponibilidade depois de " + limiteFmt() + ".")}" target="_blank" rel="noopener">consulte no WhatsApp</a></span>` : ""}
       </div>
       <div class="guests">
-        <div class="guest-box"><div><b>Adultos</b><span>13 anos ou mais</span></div>
+        <div class="guest-box"><div><b>Adultos</b><span>${KID_AGE + 1} anos ou mais</span></div>
           <div class="stepper"><button type="button" data-g="adultos" data-d="-1" ${state.adultos <= 1 ? "disabled" : ""}>−</button><output>${state.adultos}</output><button type="button" data-g="adultos" data-d="1" ${state.adultos + state.criancas >= MAX_GUESTS ? "disabled" : ""}>+</button></div></div>
-        <div class="guest-box"><div><b>Crianças</b><span>até 12 anos</span></div>
+        <div class="guest-box"><div><b>Crianças</b><span>até ${KID_AGE} anos · não pagam</span></div>
           <div class="stepper"><button type="button" data-g="criancas" data-d="-1" ${state.criancas <= 0 ? "disabled" : ""}>−</button><output>${state.criancas}</output><button type="button" data-g="criancas" data-d="1" ${state.adultos + state.criancas >= MAX_GUESTS ? "disabled" : ""}>+</button></div></div>
       </div>
       <p class="bk-error" id="bkErr"></p>
@@ -224,7 +226,7 @@
         <button type="button" class="pick-room ${state.quartoId === q.id ? "on" : ""}" data-room="${q.id}" ${ok ? "" : "disabled"}>
           <img src="${q.img}" alt="${esc(q.nome)}" />
           <div><h4>${esc(q.nome)}</h4><p>${esc(q.resumo)}</p>${badge}</div>
-          <div class="pick-room__price"><b>${brl(qq.diarias)}</b><span>${n} noite${n > 1 ? "s" : ""} · ${pessoas} pessoa${pessoas > 1 ? "s" : ""}<br/>${brl(q.preco)} por pessoa/noite</span></div>
+          <div class="pick-room__price"><b>${brl(qq.diarias)}</b><span>${n} noite${n > 1 ? "s" : ""} · ${state.adultos} adulto${state.adultos > 1 ? "s" : ""}${state.criancas ? ` + ${state.criancas} criança${state.criancas > 1 ? "s" : ""} grátis` : ""}<br/>${brl(q.preco)} por pessoa/noite</span></div>
         </button>`;
     }).join("");
     const none = C.quartos.every((q) => !(q.capacidade >= pessoas && rangeFree(q.id, state.checkin, state.checkout)));
@@ -440,7 +442,7 @@
       `*Quarto:* ${r.quartoNome}`,
       `*Check-in:* ${fmtLong(parse(r.inicio))}`,
       `*Check-out:* ${fmtLong(parse(r.fim))} (${r.noites} noites)`,
-      `*Hóspedes:* ${r.adultos} adulto(s)${r.criancas ? `, ${r.criancas} criança(s)` : ""}`,
+      `*Hóspedes:* ${r.adultos} adulto(s)${r.criancas ? `, ${r.criancas} criança(s) até ${KID_AGE} anos (não pagam)` : ""}`,
       r.extras.length ? `*Extras:* ${r.extras.map((e) => e.nome).join(", ")}` : null,
       `*Total:* ${brl(r.total)}`,
       `*Pagamento:* ${pag}`,
@@ -519,7 +521,8 @@
       return;
     }
     const lines = [
-      `<li><span>${q.n} diária${q.n > 1 ? "s" : ""} × ${q.pessoas} pessoa${q.pessoas > 1 ? "s" : ""} (${brl(q.room.preco)})</span><span>${brl(q.diarias)}</span></li>`,
+      `<li><span>${q.n} diária${q.n > 1 ? "s" : ""} × ${q.pagantes} adulto${q.pagantes > 1 ? "s" : ""} (${brl(q.room.preco)})</span><span>${brl(q.diarias)}</span></li>`,
+      q.criancas ? `<li class="disc"><span>${q.criancas} criança${q.criancas > 1 ? "s" : ""} até ${KID_AGE} anos</span><span>grátis</span></li>` : "",
       q.extraPessoas ? `<li><span>Hóspedes adicionais</span><span>${brl(q.extraPessoas)}</span></li>` : "",
       ...q.extras.map((e) => `<li><span>${esc(e.nome)}</span><span>${brl(e.total)}</span></li>`),
       q.desconto ? `<li class="disc"><span>Desconto Pix</span><span>− ${brl(q.desconto)}</span></li>` : "",

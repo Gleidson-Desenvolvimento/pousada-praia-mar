@@ -205,6 +205,10 @@ window.PM_CONFIG = {
      mude a data e/ou cadastre temporadas abaixo.                          */
   tarifaValidaAte: "2026-12-25",
 
+  /* Crianças com até esta idade (inclusive) NÃO pagam diária.
+     Elas continuam contando na capacidade do quarto (ocupam cama).       */
+  criancaGratisAte: 10,
+
   /* TEMPORADAS (opcional) — ex.:
      { nome: "Réveillon", inicio: "12-27", fim: "01-02", multiplicador: 1.5, minNoites: 5 }
      Datas "MM-DD" ou "AAAA-MM-DD". A primeira regra que bater vale.       */

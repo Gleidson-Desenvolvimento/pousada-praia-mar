@@ -180,6 +180,7 @@
           <p>${esc(q.descricao)}</p>
           <ul class="amen">${q.comodidades.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
           <p class="price" style="font-size:24px">${brl(q.preco)}<small> por pessoa/noite, com café da manhã</small></p>
+          <p class="kids-note">👶 Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam</p>
           <button class="btn btn--coral btn--lg" data-open-booking data-room="${q.id}">Reservar ${esc(q.nome)}</button>
         </div>
       </div>`;
@@ -207,6 +208,8 @@
       <li>Menos de 7 dias ou não comparecimento: sem devolução.</li>
       <li>Pacotes de Réveillon e Carnaval não são reembolsáveis, mas podem ser transferidos para outra pessoa.</li>
     </ul>
+    <h4>Crianças</h4>
+    <p>Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam diária (contam na capacidade do quarto). A partir de ${(C.criancaGratisAte ?? 10) + 1} anos, paga a diária normal por pessoa.</p>
     <h4>Horários</h4>
     <p>Check-in a partir das ${P.checkin} e check-out até as ${P.checkout}. Chegou cedo? Guardamos suas malas e você já pode ir para a praia.</p>
     <h4>Chegada em Caraíva</h4>
@@ -354,7 +357,7 @@
   const kb = [
     { k: ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "e ai"], r: "Oi! Que bom te ver por aqui 🌊 Quer saber sobre quartos, preços, como chegar em Caraíva ou já quer reservar?" },
     { k: ["quarto", "acomoda", "suite", "suíte", "chale", "chalé", "dossel"], r: `Temos ${C.quartos.length} acomodações, todas com café da manhã incluso:\n${precos}\nQuer ver a disponibilidade para as suas datas?`, a: "booking" },
-    { k: ["preco", "preço", "valor", "quanto", "custa", "diaria", "diária", "tarifa"], r: `As diárias são cobradas por pessoa e já incluem o café da manhã:\n${precos}${validade ? `\nEsses valores valem até ${validade}. Para datas depois disso (Réveillon, janeiro…), consulte a gente no WhatsApp.` : ""}`, a: "booking" },
+    { k: ["preco", "preço", "valor", "quanto", "custa", "diaria", "diária", "tarifa"], r: `As diárias são cobradas por pessoa e já incluem o café da manhã. Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam:\n${precos}${validade ? `\nEsses valores valem até ${validade}. Para datas depois disso (Réveillon, janeiro…), consulte a gente no WhatsApp.` : ""}`, a: "booking" },
     { k: ["chegar", "chego", "aeroporto", "travessia", "canoa", "estrada", "carro", "estacion", "transfer", "porto seguro", "trancoso", "onibus", "ônibus"], r: "Caraíva fica a cerca de 70 km (≈2h30) do aeroporto de Porto Seguro, com um trecho de estrada de terra. Carros não entram na vila: você estaciona em Nova Caraíva e atravessa o rio de canoa — são poucos minutos. As malas seguem de carroça pelas ruas de areia 🛶\nA pousada fica na Aldeia Xandó, R. Pedro Marcelino, no coração de Caraíva. Oferecemos transfer do aeroporto como extra na reserva.", a: "map" },
     { k: ["endereco", "endereço", "onde fica", "localiza", "mapa", "xando", "xandó"], r: `Estamos na ${P.endereco}, no coração de Caraíva, a poucos passos da praia. Toque abaixo para abrir a rota no Google Maps 📍`, a: "map" },
     { k: ["check", "horario", "horário", "entrada", "saida", "saída"], r: `Check-in a partir das ${P.checkin} e check-out até as ${P.checkout}. Se chegar antes, guardamos suas malas e você já pode curtir a praia.` },
@@ -368,7 +371,7 @@
     { k: ["praia", "mar", "rio", "banho", "onda", "agua", "água"], r: "Aqui você escolhe a água: o rio Caraíva é calmo, morno e cor de chá, ótimo para boia e crianças; o mar é aberto e com ondas. Na Praia da Barra os dois se encontram — é o cartão-postal da vila." },
     { k: ["epoca", "época", "clima", "chuva", "quando ir", "temporada", "melhor mes", "melhor mês"], r: "Faz calor o ano todo. Dezembro a fevereiro e julho são alta temporada, mais animados e disputados. Março a junho e setembro a novembro são mais tranquilos e com melhores preços. Na época de chuvas, a estrada de terra pede mais atenção (4x4 ou transfer)." },
     { k: ["wifi", "wi-fi", "internet", "sinal de celular", "trabalhar"], r: "Temos Wi-Fi para quem precisa dar uma conferida no mundo 😉 Mas a gente recomenda aproveitar a desconexão: Caraíva é lugar de céu estrelado e conversa na rede." },
-    { k: ["crianca", "criança", "filho", "familia", "família", "bebe", "bebê"], r: "Famílias são muito bem-vindas! As suítes Auê e Hayô acomodam até 5 pessoas e a Angorró até 4. O rio calminho é perfeito para os pequenos." },
+    { k: ["crianca", "criança", "filho", "familia", "família", "bebe", "bebê"], r: `Famílias são muito bem-vindas! Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam diária 👶 As suítes Auê e Hayô acomodam até 5 pessoas e a Angorró até 4. O rio calminho é perfeito para os pequenos.` },
     { k: ["reserv", "disponib", "agendar", "vaga", "data"], r: "Bora! Toque no botão abaixo para escolher as datas no calendário, ver os quartos livres e pagar com Pix na hora.", a: "booking" },
     { k: ["whats", "telefone", "contato", "falar", "atendente", "humano", "pessoa"], r: `Claro! Nosso WhatsApp é ${P.telefoneExibicao}. Toque no botão abaixo para falar com a equipe.`, a: "wa" },
   ];
