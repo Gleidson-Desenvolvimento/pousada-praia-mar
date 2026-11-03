@@ -7,6 +7,7 @@
   const C = window.PM_CONFIG;
   const STORE_KEY = "pm_reservas";
   const MAX_NIGHTS = 30;
+  const MAX_GUESTS = Math.max(...C.quartos.map((q) => q.capacidade));
 
   /* ---------------- utilidades ---------------- */
   const $ = (s, el = document) => el.querySelector(s);
@@ -39,7 +40,12 @@
     }
     return null;
   }
+  // preço POR PESSOA, por noite, com café da manhã
   const nightRate = (room, d) => Math.round(room.preco * (seasonOf(d)?.multiplicador || 1));
+  // noites depois de tarifaValidaAte ainda não têm preço → "consulte"
+  const LIMITE = C.tarifaValidaAte || null;
+  const priced = (d) => !LIMITE || key(d) <= LIMITE;
+  const limiteFmt = () => parse(LIMITE).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 
   function minNightsFor(ci, co) {
     let min = C.minNoitesPadrao, why = null;
@@ -71,19 +77,17 @@
     const room = roomById(s.quartoId);
     if (!room || !s.checkin || !s.checkout) return null;
     const n = nightsBetween(s.checkin, s.checkout);
-    let diarias = 0;
-    for (let d = new Date(s.checkin); d < s.checkout; d = addDays(d, 1)) diarias += nightRate(room, d);
-    const adultExtra = Math.max(0, s.adultos - 2);
-    const childExtra = Math.max(0, s.criancas - Math.max(0, 2 - s.adultos));
-    const extraPessoas = (adultExtra * C.hospedeExtra + childExtra * C.hospedeExtra * 0.5) * n;
     const pessoas = s.adultos + s.criancas;
+    let diarias = 0;
+    for (let d = new Date(s.checkin); d < s.checkout; d = addDays(d, 1)) diarias += nightRate(room, d) * pessoas;
+    const extraPessoas = 0;
     const extras = C.extras.filter((e) => s.extras.has(e.id)).map((e) => ({ ...e, total: e.tipo === "pessoa" ? e.preco * pessoas : e.preco }));
     const extrasTotal = extras.reduce((a, e) => a + e.total, 0);
     const subtotal = diarias + extraPessoas + extrasTotal;
     const desconto = s.pagamento === "pix-total" ? Math.round(subtotal * C.pix.descontoPagamentoTotal * 100) / 100 : 0;
     const total = subtotal - desconto;
     const agora = s.pagamento === "pix-total" ? total : Math.round(total * C.sinal * 100) / 100;
-    return { room, n, diarias, extraPessoas, extras, subtotal, desconto, total, agora, restante: total - agora };
+    return { room, n, pessoas, diarias, extraPessoas, extras, subtotal, desconto, total, agora, restante: total - agora };
   }
 
   /* ---------------- Pix (BR Code EMV) ---------------- */
@@ -144,11 +148,13 @@
       const co = state.checkout && key(state.checkout) === k;
       const inR = state.checkin && state.checkout && d > state.checkin && d < state.checkout;
       // check-out pode cair num dia lotado (a noite não é usada)
-      const canCheckout = state.checkin && !state.checkout && d > state.checkin;
-      const disabled = past || (!free && !canCheckout);
+      const canCheckout = state.checkin && !state.checkout && d > state.checkin && priced(addDays(d, -1));
+      const hasPrice = priced(d);
+      const disabled = past || ((!free || !hasPrice) && !canCheckout);
       const cls = ["cal__day", !past && !free ? "full" : "", seasonOf(d) ? "season" : "", +d === +t ? "today" : "", ci ? "start" : "", co ? "end" : "", inR ? "in" : ""].join(" ");
-      const price = !past && free ? `<small>${Math.round(cheapest(d))}</small>` : "<small>&nbsp;</small>";
-      cells += `<button type="button" class="${cls}" data-day="${k}" ${disabled ? "disabled" : ""} aria-label="${fmtLong(d)}${!free && !past ? " — lotado" : ""}">${i}${price}</button>`;
+      const price = past ? "<small>&nbsp;</small>" : !hasPrice ? "<small>—</small>" : free ? `<small>${Math.round(cheapest(d))}</small>` : "<small>&nbsp;</small>";
+      const label = !past && !hasPrice ? " — valores a consultar" : !free && !past ? " — lotado" : "";
+      cells += `<button type="button" class="${cls}${!past && !hasPrice ? " noprice" : ""}" data-day="${k}" ${disabled ? "disabled" : ""} aria-label="${fmtLong(d)}${label}">${i}${price}</button>`;
     }
     const mes = first.toLocaleDateString("pt-BR", { month: "long" });
     const title = `${mes[0].toUpperCase()}${mes.slice(1)} ${first.getFullYear()}`;
@@ -163,7 +169,7 @@
     const hint = !state.checkin ? "Toque no dia da chegada." : !state.checkout ? "Agora toque no dia da saída." : `${nightsBetween(state.checkin, state.checkout)} noite(s) selecionada(s).`;
     return `
       <p class="bk-title">Quando você vem para Caraíva?</p>
-      <p class="bk-sub">${hint} Os valores abaixo de cada dia são a diária a partir de (R$).</p>
+      <p class="bk-sub">${hint} Abaixo de cada dia: diária por pessoa a partir de (R$), com café da manhã.</p>
       <div class="cal">
         <div class="cal__nav">
           <button type="button" data-cal="-1" ${atStart ? "disabled" : ""} aria-label="Mês anterior">‹</button>
@@ -173,14 +179,15 @@
       </div>
       <div class="cal-legend">
         <span><i style="background:var(--anil)"></i>Selecionado</span>
-        <span><i style="background:rgba(224,87,58,.25)"></i>Valor em vermelho = temporada especial</span>
+        ${C.temporadas.length ? `<span><i style="background:rgba(224,87,58,.25)"></i>Valor em vermelho = temporada especial</span>` : ""}
         <span><i style="background:#e9e0cf"></i>Riscado = lotado</span>
+        ${LIMITE ? `<span>“—” = valores ainda não abertos (após ${limiteFmt()}): <a href="${waLink("Olá! Gostaria de consultar valores e disponibilidade depois de " + limiteFmt() + ".")}" target="_blank" rel="noopener">consulte no WhatsApp</a></span>` : ""}
       </div>
       <div class="guests">
         <div class="guest-box"><div><b>Adultos</b><span>13 anos ou mais</span></div>
-          <div class="stepper"><button type="button" data-g="adultos" data-d="-1" ${state.adultos <= 1 ? "disabled" : ""}>−</button><output>${state.adultos}</output><button type="button" data-g="adultos" data-d="1" ${state.adultos + state.criancas >= 6 ? "disabled" : ""}>+</button></div></div>
+          <div class="stepper"><button type="button" data-g="adultos" data-d="-1" ${state.adultos <= 1 ? "disabled" : ""}>−</button><output>${state.adultos}</output><button type="button" data-g="adultos" data-d="1" ${state.adultos + state.criancas >= MAX_GUESTS ? "disabled" : ""}>+</button></div></div>
         <div class="guest-box"><div><b>Crianças</b><span>até 12 anos</span></div>
-          <div class="stepper"><button type="button" data-g="criancas" data-d="-1" ${state.criancas <= 0 ? "disabled" : ""}>−</button><output>${state.criancas}</output><button type="button" data-g="criancas" data-d="1" ${state.adultos + state.criancas >= 6 ? "disabled" : ""}>+</button></div></div>
+          <div class="stepper"><button type="button" data-g="criancas" data-d="-1" ${state.criancas <= 0 ? "disabled" : ""}>−</button><output>${state.criancas}</output><button type="button" data-g="criancas" data-d="1" ${state.adultos + state.criancas >= MAX_GUESTS ? "disabled" : ""}>+</button></div></div>
       </div>
       <p class="bk-error" id="bkErr"></p>
       <div class="bk-nav">
@@ -194,6 +201,10 @@
     const n = nightsBetween(state.checkin, state.checkout);
     if (n < 1) return "A saída precisa ser depois da chegada.";
     if (n > MAX_NIGHTS) return `Para estadias acima de ${MAX_NIGHTS} noites, fale com a gente pelo WhatsApp.`;
+    if (LIMITE && !priced(addDays(state.checkout, -1))) {
+      const msg = "Olá! Gostaria de consultar valores e disponibilidade de " + fmtShort(state.checkin) + " a " + fmtShort(state.checkout) + ".";
+      return `Os valores para noites depois de ${limiteFmt()} ainda não estão abertos no site. <a href="${waLink(msg)}" target="_blank" rel="noopener">Consulte essas datas no WhatsApp</a> — respondemos rapidinho.`;
+    }
     const { min, why } = minNightsFor(state.checkin, state.checkout);
     if (n < min) return `Nesse período${why ? ` (${why})` : ""} a estadia mínima é de ${min} noites.`;
     return null;
@@ -213,7 +224,7 @@
         <button type="button" class="pick-room ${state.quartoId === q.id ? "on" : ""}" data-room="${q.id}" ${ok ? "" : "disabled"}>
           <img src="${q.img}" alt="${esc(q.nome)}" />
           <div><h4>${esc(q.nome)}</h4><p>${esc(q.resumo)}</p>${badge}</div>
-          <div class="pick-room__price"><b>${brl(qq.diarias + qq.extraPessoas)}</b><span>${n} noite${n > 1 ? "s" : ""} · ${pessoas} hósp.</span></div>
+          <div class="pick-room__price"><b>${brl(qq.diarias)}</b><span>${n} noite${n > 1 ? "s" : ""} · ${pessoas} pessoa${pessoas > 1 ? "s" : ""}<br/>${brl(q.preco)} por pessoa/noite</span></div>
         </button>`;
     }).join("");
     const none = C.quartos.every((q) => !(q.capacidade >= pessoas && rangeFree(q.id, state.checkin, state.checkout)));
@@ -508,7 +519,7 @@
       return;
     }
     const lines = [
-      `<li><span>${q.n} diária${q.n > 1 ? "s" : ""}</span><span>${brl(q.diarias)}</span></li>`,
+      `<li><span>${q.n} diária${q.n > 1 ? "s" : ""} × ${q.pessoas} pessoa${q.pessoas > 1 ? "s" : ""} (${brl(q.room.preco)})</span><span>${brl(q.diarias)}</span></li>`,
       q.extraPessoas ? `<li><span>Hóspedes adicionais</span><span>${brl(q.extraPessoas)}</span></li>` : "",
       ...q.extras.map((e) => `<li><span>${esc(e.nome)}</span><span>${brl(e.total)}</span></li>`),
       q.desconto ? `<li class="disc"><span>Desconto Pix</span><span>− ${brl(q.desconto)}</span></li>` : "",
@@ -566,7 +577,7 @@
         if (e.target.closest("[data-clear]")) { state.checkin = state.checkout = null; state.quartoId = null; render(); return; }
         if (e.target.closest("[data-next]")) {
           const err = validateDates();
-          if (err) { $("#bkErr").textContent = err; return; }
+          if (err) { $("#bkErr").innerHTML = err; return; }
           if (state.quartoId && !(rangeFree(state.quartoId, state.checkin, state.checkout) && roomById(state.quartoId).capacidade >= state.adultos + state.criancas)) state.quartoId = null;
           go(2);
         }

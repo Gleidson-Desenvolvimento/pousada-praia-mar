@@ -12,7 +12,9 @@ Para publicar, envie a pasta inteira para Netlify, Vercel, GitHub Pages, Hosting
 | WhatsApp, e-mail, Instagram, endereço, horários | `pousada` |
 | **Chave Pix** (o dinheiro cai direto na sua conta) | `pix.chave` |
 | Link de pagamento com cartão (Mercado Pago, InfinitePay…) | `cartao.linkPagamento` |
-| Quartos, fotos, preços, capacidade, nº de unidades | `quartos` |
+| Quartos (Baixú, Auê, Hahâu, Hayô, Maion, Angorró): fotos, camas, vista, capacidade, preço POR PESSOA | `quartos` |
+| Até quando os preços valem (datas depois aparecem como "consulte") | `tarifaValidaAte` |
+| Galeria em abas (Jardim, Sala de estar, Caraíva) | `galeria` |
 | Réveillon, Carnaval, alta temporada (preço e mínimo de noites) | `temporadas` |
 | Datas já vendidas por fora (Booking, Airbnb, telefone) | `bloqueios` |
 | Extras (transfer, carroça, passeio…) | `extras` |
@@ -47,7 +49,8 @@ são **sugestões** — revise antes de publicar. As políticas ficam em `js/app
 - `js/booking.js` — fluxo de reserva, preços, disponibilidade, Pix
 - `js/app.js` — menu, vídeo, galeria, quartos, atendimento “Maré”
 - `assets/video/caraiva-loop.mp4` — vídeo do banner (≈30 s, em loop)
-- `assets/img/` — fotos e favicon
+- `assets/img/quartos/` — fotos de cada quarto (álbuns da fotógrafa Alessia Beatrice)
+- `assets/img/galeria/` — jardim e sala de estar
 
 ## Vídeo do banner
 `assets/video/caraiva-loop.mp4` tem 38 s com cenas reais de Caraíva (encontro do rio com o mar, travessia, carroças, igrejinha, casinhas coloridas…), recortadas do vídeo do site de referência. As legendas que aparecem por cima estão em `js/app.js` (procure por `captions`).

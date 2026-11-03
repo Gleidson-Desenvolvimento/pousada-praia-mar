@@ -99,14 +99,14 @@
   $("[data-stepper]").addEventListener("click", (e) => {
     const b = e.target.closest("[data-step]");
     if (!b) return;
-    qbGuests.value = qbGuests.textContent = Math.min(6, Math.max(1, +qbGuests.textContent + +b.dataset.step));
+    qbGuests.value = qbGuests.textContent = Math.min(Math.max(...C.quartos.map((q) => q.capacidade)), Math.max(1, +qbGuests.textContent + +b.dataset.step));
   });
   $("#quickbook").addEventListener("submit", (e) => {
     e.preventDefault();
     const adultos = +qbGuests.textContent;
     if (qbIn.value && qbOut.value) {
       const err = window.PMBooking.validateRange(qbIn.value, qbOut.value);
-      if (err) { qbHint.textContent = err; return; }
+      if (err) { qbHint.innerHTML = err; return; }
       window.PMBooking.open({ checkin: qbIn.value, checkout: qbOut.value, adultos });
     } else {
       window.PMBooking.open({ adultos });
@@ -129,13 +129,13 @@
       <div class="room-card__body">
         <div class="room-card__top">
           <h3>${esc(q.nome)}</h3>
-          <span class="price"><small>a partir de </small>${brl(q.preco)}<small>/noite</small></span>
+          <span class="price">${brl(q.preco)}<small> por pessoa/noite</small></span>
         </div>
         <p>${esc(q.resumo)}</p>
         <div class="chips">
           <span class="chip">👥 até ${q.capacidade}</span>
-          <span class="chip">${esc(q.area)}</span>
-          ${q.comodidades.slice(0, 2).map((c) => `<span class="chip">${esc(c)}</span>`).join("")}
+          ${q.camas ? `<span class="chip">🛏️ ${esc(q.camas)}</span>` : ""}
+          ${q.vista ? `<span class="chip">🌿 vista ${esc(q.vista.toLowerCase())}</span>` : ""}
         </div>
         <div class="room-card__actions">
           <button class="btn btn--line" data-room-details="${q.id}">Detalhes</button>
@@ -176,10 +176,10 @@
         <div class="room-modal__info">
           <p class="eyebrow">${esc(q.tag || "Acomodação")}</p>
           <h3 class="h3" id="roomModalTitle">${esc(q.nome)}</h3>
-          <div class="room-modal__facts"><span class="chip">👥 até ${q.capacidade} pessoas</span><span class="chip">📐 ${esc(q.area)}</span><span class="chip">☕ café incluso</span></div>
+          <div class="room-modal__facts"><span class="chip">👥 até ${q.capacidade} pessoas</span>${q.camas ? `<span class="chip">🛏️ ${esc(q.camas)}</span>` : ""}${q.vista ? `<span class="chip">🌿 vista ${esc(q.vista.toLowerCase())}</span>` : ""}<span class="chip">☕ café incluso</span></div>
           <p>${esc(q.descricao)}</p>
           <ul class="amen">${q.comodidades.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
-          <p class="price" style="font-size:24px"><small>a partir de </small>${brl(q.preco)}<small>/noite</small></p>
+          <p class="price" style="font-size:24px">${brl(q.preco)}<small> por pessoa/noite, com café da manhã</small></p>
           <button class="btn btn--coral btn--lg" data-open-booking data-room="${q.id}">Reservar ${esc(q.nome)}</button>
         </div>
       </div>`;
@@ -220,10 +220,48 @@
   /* ---------------- galeria / lightbox ---------------- */
   const lb = $("#lightbox");
   const lbImg = $("#lightboxImg");
-  const shots = $$("[data-lightbox] img").map((i) => ({ src: i.src, alt: i.alt }));
+  let shots = [];
   let lbI = 0;
   const showLb = (i) => { lbI = (i + shots.length) % shots.length; lbImg.src = shots[lbI].src; lbImg.alt = shots[lbI].alt; };
-  $$("[data-lightbox]").forEach((b) => b.addEventListener("click", () => { showLb(+b.dataset.lightbox); openModal(lb); }));
+
+  // abas da galeria (Jardim / Sala de estar / Caraíva) — conteúdo em config.js
+  const gal = C.galeria || [];
+  const galTabs = $("#galTabs"), galGrid = $("#galGrid"), galText = $("#galText");
+  function showGal(id) {
+    const g = gal.find((x) => x.id === id) || gal[0];
+    $$("button", galTabs).forEach((b) => b.setAttribute("aria-selected", b.dataset.gal === g.id));
+    galText.textContent = g.texto || "";
+    galGrid.innerHTML = g.fotos.map(([src, alt], i) => `<button class="g-slide" data-lightbox="${i}" aria-label="Ampliar foto ${i + 1} de ${g.fotos.length}: ${esc(alt)}"><img src="${src}" alt="${esc(alt)}" loading="${i < 4 ? "eager" : "lazy"}" /></button>`).join("");
+    shots = g.fotos.map(([src, alt]) => ({ src, alt }));
+    galGrid.scrollLeft = 0;
+    updateGal();
+  }
+  // carrossel: setas, barra de progresso e contador
+  const galPrev = $("#galPrev"), galNext = $("#galNext"), galBar = $("#galBar"), galCount = $("#galCount");
+  const slideStep = () => { const s = galGrid.querySelector(".g-slide"); return s ? s.getBoundingClientRect().width + 14 : 300; };
+  function updateGal() {
+    const max = galGrid.scrollWidth - galGrid.clientWidth;
+    const total = shots.length;
+    const first = Math.min(total, Math.round(galGrid.scrollLeft / slideStep()) + 1);
+    const visible = Math.max(1, Math.floor((galGrid.clientWidth + 14) / slideStep()));
+    const last = Math.min(total, first + visible - 1);
+    galCount.textContent = total ? (first === last ? `${first} / ${total}` : `${first}–${last} / ${total}`) : "";
+    galBar.style.width = max > 0 ? `${Math.max(visible / total, galGrid.scrollLeft / max) * 100}%` : "100%";
+    galPrev.disabled = galGrid.scrollLeft <= 4;
+    galNext.disabled = galGrid.scrollLeft >= max - 4;
+  }
+  galPrev.addEventListener("click", () => galGrid.scrollBy({ left: -slideStep(), behavior: "smooth" }));
+  galNext.addEventListener("click", () => galGrid.scrollBy({ left: slideStep(), behavior: "smooth" }));
+  galGrid.addEventListener("scroll", () => requestAnimationFrame(updateGal), { passive: true });
+  galGrid.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); galNext.click(); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); galPrev.click(); }
+  });
+  window.addEventListener("resize", updateGal);
+  galTabs.innerHTML = gal.map((g) => `<button type="button" role="tab" data-gal="${g.id}">${esc(g.titulo)} <small>${g.fotos.length}</small></button>`).join("");
+  galTabs.addEventListener("click", (e) => { const b = e.target.closest("[data-gal]"); if (b) showGal(b.dataset.gal); });
+  if (gal.length) showGal(gal[0].id);
+  galGrid.addEventListener("click", (e) => { const b = e.target.closest("[data-lightbox]"); if (b) { showLb(+b.dataset.lightbox); openModal(lb); } });
   $(".lightbox__prev").addEventListener("click", () => showLb(lbI - 1));
   $(".lightbox__next").addEventListener("click", () => showLb(lbI + 1));
   lb.addEventListener("click", (e) => { if (e.target === lb || e.target.closest("[data-close]")) closeModal(lb); });
@@ -311,11 +349,12 @@
   /* =====================================================================
      ATENDIMENTO "MARÉ" — respostas sobre a pousada e sobre Caraíva
      ===================================================================== */
-  const precos = C.quartos.map((q) => `• ${q.nome}: a partir de ${brl(q.preco)}/noite (até ${q.capacidade} pessoas)`).join("\n");
+  const precos = C.quartos.map((q) => `• ${q.nome}: ${brl(q.preco)} por pessoa/noite (até ${q.capacidade} pessoas)`).join("\n");
+  const validade = C.tarifaValidaAte ? new Date(C.tarifaValidaAte + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : "";
   const kb = [
     { k: ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "e ai"], r: "Oi! Que bom te ver por aqui 🌊 Quer saber sobre quartos, preços, como chegar em Caraíva ou já quer reservar?" },
-    { k: ["quarto", "acomoda", "suite", "suíte", "chale", "chalé", "dossel"], r: `Temos 3 tipos de acomodação, todas com banheiro privativo e café da manhã:\n${precos}\nQuer ver a disponibilidade para as suas datas?`, a: "booking" },
-    { k: ["preco", "preço", "valor", "quanto", "custa", "diaria", "diária", "tarifa"], r: `Os valores variam com a temporada:\n${precos}\nNo Réveillon, Carnaval e alta temporada há tarifas especiais e mínimo de noites. O calendário da reserva mostra o valor de cada dia.`, a: "booking" },
+    { k: ["quarto", "acomoda", "suite", "suíte", "chale", "chalé", "dossel"], r: `Temos ${C.quartos.length} acomodações, todas com café da manhã incluso:\n${precos}\nQuer ver a disponibilidade para as suas datas?`, a: "booking" },
+    { k: ["preco", "preço", "valor", "quanto", "custa", "diaria", "diária", "tarifa"], r: `As diárias são cobradas por pessoa e já incluem o café da manhã:\n${precos}${validade ? `\nEsses valores valem até ${validade}. Para datas depois disso (Réveillon, janeiro…), consulte a gente no WhatsApp.` : ""}`, a: "booking" },
     { k: ["chegar", "chego", "aeroporto", "travessia", "canoa", "estrada", "carro", "estacion", "transfer", "porto seguro", "trancoso", "onibus", "ônibus"], r: "Caraíva fica a cerca de 70 km (≈2h30) do aeroporto de Porto Seguro, com um trecho de estrada de terra. Carros não entram na vila: você estaciona em Nova Caraíva e atravessa o rio de canoa — são poucos minutos. As malas seguem de carroça pelas ruas de areia 🛶\nA pousada fica na Aldeia Xandó, R. Pedro Marcelino, no coração de Caraíva. Oferecemos transfer do aeroporto como extra na reserva.", a: "map" },
     { k: ["endereco", "endereço", "onde fica", "localiza", "mapa", "xando", "xandó"], r: `Estamos na ${P.endereco}, no coração de Caraíva, a poucos passos da praia. Toque abaixo para abrir a rota no Google Maps 📍`, a: "map" },
     { k: ["check", "horario", "horário", "entrada", "saida", "saída"], r: `Check-in a partir das ${P.checkin} e check-out até as ${P.checkout}. Se chegar antes, guardamos suas malas e você já pode curtir a praia.` },
@@ -329,7 +368,7 @@
     { k: ["praia", "mar", "rio", "banho", "onda", "agua", "água"], r: "Aqui você escolhe a água: o rio Caraíva é calmo, morno e cor de chá, ótimo para boia e crianças; o mar é aberto e com ondas. Na Praia da Barra os dois se encontram — é o cartão-postal da vila." },
     { k: ["epoca", "época", "clima", "chuva", "quando ir", "temporada", "melhor mes", "melhor mês"], r: "Faz calor o ano todo. Dezembro a fevereiro e julho são alta temporada, mais animados e disputados. Março a junho e setembro a novembro são mais tranquilos e com melhores preços. Na época de chuvas, a estrada de terra pede mais atenção (4x4 ou transfer)." },
     { k: ["wifi", "wi-fi", "internet", "sinal de celular", "trabalhar"], r: "Temos Wi-Fi para quem precisa dar uma conferida no mundo 😉 Mas a gente recomenda aproveitar a desconexão: Caraíva é lugar de céu estrelado e conversa na rede." },
-    { k: ["crianca", "criança", "filho", "familia", "família", "bebe", "bebê"], r: "Famílias são muito bem-vindas! O Chalé Maré acomoda até 4 pessoas, e o rio calminho é perfeito para os pequenos. Crianças até 12 anos pagam metade da taxa de hóspede adicional." },
+    { k: ["crianca", "criança", "filho", "familia", "família", "bebe", "bebê"], r: "Famílias são muito bem-vindas! As suítes Auê e Hayô acomodam até 5 pessoas e a Angorró até 4. O rio calminho é perfeito para os pequenos." },
     { k: ["reserv", "disponib", "agendar", "vaga", "data"], r: "Bora! Toque no botão abaixo para escolher as datas no calendário, ver os quartos livres e pagar com Pix na hora.", a: "booking" },
     { k: ["whats", "telefone", "contato", "falar", "atendente", "humano", "pessoa"], r: `Claro! Nosso WhatsApp é ${P.telefoneExibicao}. Toque no botão abaixo para falar com a equipe.`, a: "wa" },
   ];

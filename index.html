@@ -81,11 +81,6 @@
         <span class="hand" id="heroCaption">onde o rio encontra o mar</span>
       </div>
 
-      <ul class="hero__trust">
-        <li><span>🌊</span> Pé na areia, entre rio e mar</li>
-        <li><span>☕</span> Café da manhã baiano incluso</li>
-        <li><span>🛶</span> Ajudamos na travessia</li>
-      </ul>
 
       <button class="hero__pause" id="videoToggle" aria-label="Pausar vídeo" title="Pausar vídeo">
         <svg viewBox="0 0 24 24" width="16" height="16"><path id="videoToggleIcon" d="M7 5h3v14H7zM14 5h3v14h-3z" fill="currentColor"/></svg>
@@ -260,14 +255,18 @@
             <p class="eyebrow">Galeria</p>
             <h2 class="h2">Um pouco da <em>Praia Mar</em></h2>
           </div>
-          <p class="muted section-head__aside">Toque nas fotos para ampliar.</p>
+          <p class="muted section-head__aside">Os espaços para viver a pousada além do quarto. Toque nas fotos para ampliar.</p>
         </div>
-        <div class="gallery__grid">
-          <button class="g g--tall" data-lightbox="0"><img src="assets/img/aerea-rio-mar.jpg" alt="Vista aérea do encontro do rio com o mar em Caraíva" loading="lazy" /></button>
-          <button class="g g--wide" data-lightbox="1"><img src="assets/img/canoas-por-do-sol.jpg" alt="Canoas coloridas no Rio Caraíva" loading="lazy" /></button>
-          <button class="g" data-lightbox="2"><img src="assets/img/suite-dossel.jpg" alt="Suíte com cama de dossel" loading="lazy" /></button>
-          <button class="g" data-lightbox="3"><img src="assets/img/jardim-redes.jpg" alt="Redes no jardim tropical" loading="lazy" /></button>
-          <button class="g g--wide" data-lightbox="4"><img src="assets/img/chale-sala.jpg" alt="Sala colorida do chalé com rede e sofás" loading="lazy" /></button>
+        <div class="gal-tabs" role="tablist" id="galTabs"><!-- renderizado por app.js --></div>
+        <p class="gal-text" id="galText"></p>
+        <div class="gal-carousel">
+          <button type="button" class="gal-nav gal-nav--prev" id="galPrev" aria-label="Fotos anteriores">‹</button>
+          <div class="gal-track" id="galGrid" tabindex="0" aria-label="Fotos da galeria"><!-- renderizado por app.js --></div>
+          <button type="button" class="gal-nav gal-nav--next" id="galNext" aria-label="Próximas fotos">›</button>
+        </div>
+        <div class="gal-foot">
+          <div class="gal-progress"><span id="galBar"></span></div>
+          <span class="gal-count" id="galCount"></span>
         </div>
       </div>
     </section>

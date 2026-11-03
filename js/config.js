@@ -52,70 +52,167 @@ window.PM_CONFIG = {
   webhookUrl: "",
 
   /* ---------------- ACOMODAÇÕES ----------------------------------------
-     preco = diária base (baixa temporada) para a ocupação padrão
+     preco = diária POR PESSOA, com café da manhã (vale até tarifaValidaAte)
      unidades = quantos quartos iguais a pousada tem desse tipo           */
   quartos: [
     {
-      id: "suite-dossel",
-      nome: "Suíte Dossel",
-      resumo: "Cama queen com dossel de voil, paredes em tons de pôr do sol e luz natural entrando pela manhã.",
+      id: "baixu",
+      nome: "Suíte Baixú",
+      resumo: "Suíte clara e fresca com cama queen, cama de solteiro e vista para o jardim.",
       descricao:
-        "A suíte mais romântica da casa. Cama queen envolta em dossel de voil branco, paredes pintadas à mão com as cores do entardecer no rio, madeira de demolição e piso de cimento queimado fresquinho. Ideal para casais que vieram para desacelerar.",
-      img: "assets/img/suite-dossel.jpg",
-      galeria: ["assets/img/suite-dossel.jpg", "assets/img/jardim-redes.jpg", "assets/img/canoas-por-do-sol.jpg"],
+        "Clara, fresca e cheia de luz natural. A Baixú tem cama queen com mosquiteiro, uma cama de solteiro, janelas de madeira abertas para o jardim e banheiro em tons de azul.",
+      img: "assets/img/quartos/baixu-1.jpg",
+      galeria: ["assets/img/quartos/baixu-1.jpg", "assets/img/quartos/baixu-2.jpg", "assets/img/quartos/baixu-3.jpg", "assets/img/quartos/baixu-4.jpg", "assets/img/quartos/baixu-5.jpg", "assets/img/quartos/baixu-6.jpg"],
+      tag: "Vista para o jardim",
+      capacidade: 3,
+      camas: "1 queen + 1 solteiro",
+      vista: "Jardim",
+      preco: 135,
+      unidades: 1,
+      comodidades: ["1 cama queen", "1 cama de solteiro", "Vista para o jardim", "Ar-condicionado", "Wi-Fi", "Café da manhã"],
+    },
+    {
+      id: "aue",
+      nome: "Suíte Auê",
+      resumo: "A maior suíte da casa: cama king, 3 camas de solteiro e vista para o jardim.",
+      descricao:
+        "Espaçosa e cheia de cor, com paredes pintadas à mão nos tons do pôr do sol. Cama king com dossel, três camas de solteiro e vista para o jardim — perfeita para famílias e grupos de amigos.",
+      img: "assets/img/quartos/aue-1.jpg",
+      galeria: ["assets/img/quartos/aue-1.jpg", "assets/img/quartos/aue-2.jpg", "assets/img/quartos/aue-3.jpg", "assets/img/quartos/aue-4.jpg", "assets/img/quartos/aue-5.jpg", "assets/img/quartos/aue-6.jpg"],
+      tag: "Família",
+      capacidade: 5,
+      camas: "1 king + 3 solteiro",
+      vista: "Jardim",
+      preco: 150,
+      unidades: 1,
+      comodidades: ["1 cama king", "3 camas de solteiro", "Vista para o jardim", "Ar-condicionado", "Wi-Fi", "Café da manhã"],
+    },
+    {
+      id: "hahau",
+      nome: "Suíte Hahâu",
+      resumo: "Suíte para casal com cama queen com dossel e vista para a varanda.",
+      descricao:
+        "A suíte mais romântica da Praia Mar. Cama queen com dossel de voil, grafismos em tons de areia nas paredes e janela para a varanda com espreguiçadeiras.",
+      img: "assets/img/quartos/hahau-1.jpg",
+      galeria: ["assets/img/quartos/hahau-1.jpg", "assets/img/quartos/hahau-2.jpg", "assets/img/quartos/hahau-3.jpg", "assets/img/quartos/hahau-4.jpg", "assets/img/quartos/hahau-5.jpg", "assets/img/quartos/hahau-6.jpg"],
       tag: "Para casais",
       capacidade: 2,
-      area: "22 m²",
-      preco: 420,
-      unidades: 3,
-      comodidades: ["Cama queen com dossel", "Ventilador de teto", "Frigobar", "Banheiro privativo", "Roupa de cama e banho", "Café da manhã"],
-    },
-    {
-      id: "suite-jardim",
-      nome: "Suíte Jardim",
-      resumo: "Varanda com rede de frente para o jardim tropical, samambaias e o som dos passarinhos.",
-      descricao:
-        "Abre direto para o jardim, com varanda própria, rede baiana e samambaias penduradas. Perfeita para quem quer ler, cochilar depois da praia e ouvir os sabiás no fim da tarde.",
-      img: "assets/img/jardim-redes.jpg",
-      galeria: ["assets/img/jardim-redes.jpg", "assets/img/suite-dossel.jpg", "assets/img/aerea-rio-mar.jpg"],
-      tag: "Mais pedida",
-      capacidade: 3,
-      area: "26 m²",
-      preco: 490,
-      unidades: 2,
-      comodidades: ["Varanda com rede", "Cama casal + solteiro", "Ventilador de teto", "Frigobar", "Banheiro privativo", "Café da manhã"],
-    },
-    {
-      id: "chale-mare",
-      nome: "Chalé Maré",
-      resumo: "Chalé com sala colorida, rede, sofás e ar-condicionado. Espaço de sobra para família e amigos.",
-      descricao:
-        "Um pedacinho de casa em Caraíva: sala com paredes anil e mostarda, sofás de madeira maciça, rede para a sesta, mesa para o café e quarto separado. Cabe a família inteira — e ainda sobra lugar para a canga molhada.",
-      img: "assets/img/chale-sala.jpg",
-      galeria: ["assets/img/chale-sala.jpg", "assets/img/suite-dossel.jpg", "assets/img/jardim-redes.jpg"],
-      tag: "Família",
-      capacidade: 4,
-      area: "45 m²",
-      preco: 690,
+      camas: "1 queen",
+      vista: "Varanda",
+      preco: 135,
       unidades: 1,
-      comodidades: ["Sala de estar com rede", "Quarto separado", "Ar-condicionado", "Frigobar", "Mesa de refeições", "Café da manhã"],
+      comodidades: ["1 cama queen", "Vista para a varanda", "Ar-condicionado", "Wi-Fi", "Café da manhã"],
+    },
+    {
+      id: "hayo",
+      nome: "Suíte Hayô",
+      resumo: "Cama queen, 3 camas de solteiro e vista para a varanda.",
+      descricao:
+        "Barrado verde-mar, luminárias de palha e espelho com moldura colorida. Cama queen com dossel, três camas de solteiro e vista para a varanda — espaço de sobra para a família toda.",
+      img: "assets/img/quartos/hayo-1.jpg",
+      galeria: ["assets/img/quartos/hayo-1.jpg", "assets/img/quartos/hayo-2.jpg", "assets/img/quartos/hayo-3.jpg", "assets/img/quartos/hayo-4.jpg", "assets/img/quartos/hayo-5.jpg", "assets/img/quartos/hayo-6.jpg"],
+      tag: "Família",
+      capacidade: 5,
+      camas: "1 queen + 3 solteiro",
+      vista: "Varanda",
+      preco: 150,
+      unidades: 1,
+      comodidades: ["1 cama queen", "3 camas de solteiro", "Vista para a varanda", "Ar-condicionado", "Wi-Fi", "Café da manhã"],
+    },
+    {
+      id: "maion",
+      nome: "Quarto Maion",
+      resumo: "Quarto aconchegante com cama de casal e cama de solteiro.",
+      descricao:
+        "Simples e aconchegante, com cama de casal, cama de solteiro, sofá listrado para descansar e janela de madeira deixando a brisa entrar.",
+      img: "assets/img/quartos/maion-1.jpg",
+      galeria: ["assets/img/quartos/maion-1.jpg", "assets/img/quartos/maion-2.jpg", "assets/img/quartos/maion-3.jpg", "assets/img/quartos/maion-4.jpg", "assets/img/quartos/maion-5.jpg"],
+      tag: "",
+      capacidade: 3,
+      camas: "1 casal + 1 solteiro",
+      vista: "",
+      preco: 125,
+      unidades: 1,
+      comodidades: ["1 cama de casal", "1 cama de solteiro", "Wi-Fi", "Café da manhã"],
+    },
+    {
+      id: "angoro",
+      nome: "Suíte Angorró",
+      resumo: "Cama king com dossel e 2 camas de solteiro.",
+      descricao:
+        "Luz suave, pratos de palha trançada na parede e cama king com dossel, além de duas camas de solteiro. Ótima para casal com filhos ou amigos viajando juntos.",
+      img: "assets/img/quartos/angoro-1.jpg",
+      galeria: ["assets/img/quartos/angoro-1.jpg", "assets/img/quartos/angoro-2.jpg", "assets/img/quartos/angoro-3.jpg", "assets/img/quartos/angoro-4.jpg", "assets/img/quartos/angoro-5.jpg", "assets/img/quartos/angoro-6.jpg"],
+      tag: "",
+      capacidade: 4,
+      camas: "1 king + 2 solteiro",
+      vista: "",
+      preco: 135,
+      unidades: 1,
+      comodidades: ["1 cama king", "2 camas de solteiro", "Ar-condicionado", "Wi-Fi", "Café da manhã"],
     },
   ],
 
-  /* ---------------- TEMPORADAS ------------------------------------------
-     Datas no formato "MM-DD". A primeira regra que bater vale.
-     Para regras com ano específico (Carnaval) use "AAAA-MM-DD".         */
-  temporadas: [
-    { nome: "Réveillon", inicio: "12-27", fim: "01-02", multiplicador: 1.9, minNoites: 5 },
-    { nome: "Carnaval 2027", inicio: "2027-02-05", fim: "2027-02-10", multiplicador: 1.6, minNoites: 4 },
-    { nome: "Alta temporada", inicio: "12-15", fim: "02-28", multiplicador: 1.3, minNoites: 3 },
-    { nome: "Férias de julho", inicio: "07-01", fim: "07-31", multiplicador: 1.2, minNoites: 2 },
+  /* ---------------- GALERIA (abas) ------------------------------------- */
+  galeria: [
+    {
+      id: "jardim",
+      titulo: "Jardim",
+      texto: "Gramado e fresco para curtir a natureza e ficar à sombra de um longevo e lindo cajueiro.",
+      fotos: [
+        ["assets/img/galeria/jardim-11.jpg", "Varanda da pousada de frente para o jardim"],
+        ["assets/img/galeria/jardim-3.jpg", "Gramado com espreguiçadeiras sob o céu azul"],
+        ["assets/img/galeria/jardim-1.jpg", "Mesas de madeira na varanda coberta de palha"],
+        ["assets/img/galeria/jardim-5.jpg", "Espreguiçadeiras entre as plantas do jardim"],
+        ["assets/img/galeria/jardim-4.jpg", "Varanda com mesas compridas de madeira"],
+        ["assets/img/galeria/jardim-2.jpg", "Jardim visto da varanda"],
+        ["assets/img/jardim-redes.jpg", "Redes penduradas com samambaias no jardim"],
+        ["assets/img/galeria/jardim-7.jpg", "Mesas coloridas na varanda"],
+        ["assets/img/galeria/jardim-9.jpg", "Cadeiras de praia no gramado"],
+        ["assets/img/galeria/jardim-6.jpg", "Placa Lava-pés entre as plantas"],
+        ["assets/img/galeria/jardim-8.jpg", "Mesa e plantas na varanda"],
+        ["assets/img/galeria/jardim-10.jpg", "Cachorro da pousada descansando na sombra"],
+        ["assets/img/galeria/jardim-12.jpg", "Placa: que bom que você chegou"],
+      ],
+    },
+    {
+      id: "sala",
+      titulo: "Sala de estar",
+      texto: "Rede e sofás para ficar à vontade.",
+      fotos: [
+        ["assets/img/galeria/sala-1.jpg", "Sala de estar com rede, sofás e parede amarela"],
+        ["assets/img/galeria/sala-3.jpg", "Sala com cadeiras de fio e parede pintada com folhagens"],
+        ["assets/img/chale-sala.jpg", "Sofá de madeira, rede azul e mesa posta"],
+        ["assets/img/galeria/sala-2.jpg", "Aparador de madeira e artesanato na sala"],
+        ["assets/img/galeria/sala-4.jpg", "Sofá com almofadas e janela de madeira"],
+      ],
+    },
+    {
+      id: "caraiva",
+      titulo: "Caraíva",
+      texto: "A vila entre o rio e o mar, a poucos passos da pousada.",
+      fotos: [
+        ["assets/img/aerea-rio-mar.jpg", "Vista aérea do encontro do rio com o mar em Caraíva"],
+        ["assets/img/canoas-por-do-sol.jpg", "Canoas coloridas no Rio Caraíva ao pôr do sol"],
+      ],
+    },
   ],
-  minNoitesPadrao: 2,
-  hospedeExtra: 90, // por noite, acima de 2 pessoas
+
+  /* ---------------- TARIFA EM VIGOR -------------------------------------
+     Os preços acima valem para as noites até esta data (inclusive).
+     Noites depois dela aparecem como "consulte" no calendário e o hóspede
+     é levado ao WhatsApp. Quando tiver a nova tabela (Réveillon, janeiro…),
+     mude a data e/ou cadastre temporadas abaixo.                          */
+  tarifaValidaAte: "2026-12-25",
+
+  /* TEMPORADAS (opcional) — ex.:
+     { nome: "Réveillon", inicio: "12-27", fim: "01-02", multiplicador: 1.5, minNoites: 5 }
+     Datas "MM-DD" ou "AAAA-MM-DD". A primeira regra que bater vale.       */
+  temporadas: [],
+  minNoitesPadrao: 1,
 
   /* Datas já ocupadas (reservas feitas por fora: Booking, Airbnb, telefone)
-     { quarto: "suite-dossel", inicio: "2026-12-27", fim: "2027-01-02" }
+     { quarto: "baixu", inicio: "2026-12-27", fim: "2027-01-02" }
      "fim" = dia do check-out                                              */
   bloqueios: [],
 
