@@ -64,7 +64,7 @@
 
   /* ---------------- disponibilidade ---------------- */
   const loadStored = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; } };
-  const allBookings = () => [...(C.bloqueios || []), ...loadStored().filter((r) => r.status !== "cancelada")];
+  const allBookings = () => [...(C.bloqueios || []), ...(window.PMOcupacao?.lista || []), ...loadStored().filter((r) => r.status !== "cancelada")];
 
   function unitsFree(roomId, dk) {
     const room = roomById(roomId);
@@ -411,7 +411,12 @@
     return s;
   }
 
-  function finish() {
+  let finishing = false;
+  async function finish() {
+    if (finishing) return;
+    finishing = true;
+    try { await window.PMOcupacao?.atualizar(); } finally { finishing = false; } // datas ocupadas mais recentes do painel
+    if (state.step !== 4) return;
     const q = quote();
     // checa de novo a disponibilidade (pode ter mudado)
     if (!rangeFree(state.quartoId, state.checkin, state.checkout)) {
@@ -650,6 +655,7 @@
   /* ---------------- abrir / fechar ---------------- */
   let lastFocus = null;
   function open(opts = {}) {
+    window.PMOcupacao?.atualizar(); // o calendário se redesenha quando chegar (evento pm:ocupacao)
     if (state.step === 5) state = fresh();
     if (opts.checkin) { state.checkin = parse(opts.checkin); state.calMonth = new Date(state.checkin.getFullYear(), state.checkin.getMonth(), 1); }
     if (opts.checkout) state.checkout = parse(opts.checkout);
@@ -671,6 +677,9 @@
     if (state.step === 5) state = fresh();
     lastFocus?.focus?.();
   }
+
+  // datas ocupadas do painel chegaram: redesenha o calendário / lista de quartos se estiverem na tela
+  document.addEventListener("pm:ocupacao", () => { if (!modal().hidden && state.step <= 2) render(); });
 
   document.addEventListener("DOMContentLoaded", () => {
     ["click", "change", "input"].forEach((t) => $("#bkMain").addEventListener(t, (e) => handlers[state.step]?.[t]?.(e)));
