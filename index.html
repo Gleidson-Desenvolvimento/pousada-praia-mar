@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pousada Praia Mar · Caraíva, Bahia — entre o rio e o mar</title>
+  <meta name="description" content="Pousada pé na areia em Caraíva, Bahia. Vila sem carros, ruas de areia, travessia de canoa e o encontro do rio com o mar. Reserve online com Pix." />
+  <meta property="og:title" content="Pousada Praia Mar · Caraíva" />
+  <meta property="og:description" content="Entre o rio e o mar, o tempo anda descalço. Reserve sua estadia em Caraíva." />
+  <meta property="og:image" content="assets/img/aerea-rio-mar.jpg" />
+  <meta name="theme-color" content="#1f2660" />
+  <link rel="icon" href="assets/img/logo-praia-mar.jpg" type="image/jpeg" />
+  <link rel="apple-touch-icon" href="assets/img/logo-praia-mar.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ============================== NAV ============================== -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="#topo" class="brand" aria-label="Pousada Praia Mar — início">
+        <img class="brand__mark" src="assets/img/logo-praia-mar.jpg" alt="" width="46" height="46" />
+        <span class="brand__text">
+          <span class="brand__name">Praia Mar</span>
+          <span class="brand__sub">Pousada · Caraíva</span>
+        </span>
+      </a>
+      <nav class="nav__links" aria-label="Principal">
+        <a href="#acomodacoes">Acomodações</a>
+        <a href="#caraiva">Caraíva</a>
+        <a href="#experiencias">Experiências</a>
+        <a href="#galeria">Galeria</a>
+        <a href="#como-chegar">Como chegar</a>
+      </nav>
+      <button class="btn btn--sun nav__cta" data-open-booking>Reservar</button>
+      <button class="nav__burger" id="burger" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav__mobile" id="mobileMenu">
+      <a href="#acomodacoes">Acomodações</a>
+      <a href="#caraiva">Caraíva</a>
+      <a href="#experiencias">Experiências</a>
+      <a href="#galeria">Galeria</a>
+      <a href="#como-chegar">Como chegar</a>
+      <button class="btn btn--sun" data-open-booking>Reservar agora</button>
+    </div>
+  </header>
+
+  <main id="topo">
+    <!-- ============================== HERO ============================== -->
+    <section class="hero">
+      <video class="hero__video" id="heroVideo" autoplay muted loop playsinline preload="auto"
+             poster="assets/video/caraiva-poster.jpg">
+        <source src="assets/video/caraiva-loop.mp4" type="video/mp4" />
+      </video>
+      <div class="hero__shade"></div>
+      <div class="hero__grain"></div>
+
+      <div class="container hero__content">
+        <p class="pill pill--glass reveal">
+          <span class="dot"></span> Caraíva · Porto Seguro · Bahia
+        </p>
+        <h1 class="hero__title reveal">
+          Seu tempo<br /><em>desacelera aqui.</em>
+        </h1>
+        <p class="hero__lead reveal">
+          Uma pousada íntima entre o rio e o mar, feita para quem quer trocar
+          o barulho do mundo pelo som das ondas.
+        </p>
+        <div class="hero__actions reveal">
+          <button class="btn btn--sun btn--lg" data-open-booking>Ver disponibilidade</button>
+          <a href="#acomodacoes" class="btn btn--ghost btn--lg">Conhecer os quartos</a>
+        </div>
+      </div>
+
+      <div class="hero__caption" aria-live="polite">
+        <span class="hand" id="heroCaption">onde o rio encontra o mar</span>
+      </div>
+
+      <ul class="hero__trust">
+        <li><span>🌊</span> Pé na areia, entre rio e mar</li>
+        <li><span>☕</span> Café da manhã baiano incluso</li>
+        <li><span>🛶</span> Ajudamos na travessia</li>
+      </ul>
+
+      <button class="hero__pause" id="videoToggle" aria-label="Pausar vídeo" title="Pausar vídeo">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path id="videoToggleIcon" d="M7 5h3v14H7zM14 5h3v14h-3z" fill="currentColor"/></svg>
+      </button>
+    </section>
+
+    <!-- ========================= BARRA DE RESERVA ========================= -->
+    <section class="quickbook-wrap" aria-label="Busca rápida de disponibilidade">
+      <form class="container quickbook" id="quickbook" novalidate>
+        <label class="qb-field">
+          <span>Check-in</span>
+          <input type="date" id="qbIn" required />
+        </label>
+        <label class="qb-field">
+          <span>Check-out</span>
+          <input type="date" id="qbOut" required />
+        </label>
+        <div class="qb-field">
+          <span>Hóspedes</span>
+          <div class="stepper" data-stepper>
+            <button type="button" data-step="-1" aria-label="Menos hóspedes">−</button>
+            <output id="qbGuests">2</output>
+            <button type="button" data-step="1" aria-label="Mais hóspedes">+</button>
+          </div>
+        </div>
+        <button class="btn btn--coral btn--lg qb-submit" type="submit">Buscar quartos →</button>
+        <p class="qb-hint" id="qbHint"></p>
+      </form>
+    </section>
+
+    <!-- ============================== A POUSADA ============================== -->
+    <section class="section intro" id="pousada">
+      <div class="container intro__grid">
+        <div class="intro__text">
+          <p class="eyebrow">A pousada</p>
+          <h2 class="h2">Tem lugares que<br /><em>fazem sentir.</em></h2>
+          <p class="lead">
+            Na Praia Mar, cada detalhe foi pensado para você respirar fundo e lembrar que a vida
+            também pode ser simples. Acorde sem pressa, tome um café da manhã caprichado e escolha
+            o banho do dia: o <strong>mar aberto</strong>, com ondas, ou o <strong>rio de águas calmas e mornas</strong>.
+          </p>
+          <ul class="checks">
+            <li>Na Aldeia Xandó, no coração de Caraíva</li>
+            <li>A poucos passos da praia, entre o rio e o mar</li>
+            <li>Suítes com ar-condicionado e Wi-Fi</li>
+            <li>Café da manhã incluso, com redes e jardim para descansar</li>
+          </ul>
+          <blockquote class="intro__quote">
+            “O luxo de acordar sem pressa, com o mar logo ali.”
+          </blockquote>
+        </div>
+        <figure class="intro__photo reveal">
+          <img src="assets/img/aerea-rio-mar.jpg" alt="Vista aérea de Caraíva mostrando o mar à esquerda, o rio à direita e a ponta de areia onde se encontram" loading="lazy" />
+          <figcaption class="hand">o encontro das águas, vista do alto ✿</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>sem carros</span><i>✺</i><span>ruas de areia</span><i>✺</i><span>travessia de canoa</span><i>✺</i><span>forró pé de serra</span><i>✺</i><span>rio e mar</span><i>✺</i><span>céu de estrelas</span><i>✺</i><span>pé descalço</span><i>✺</i>
+        <span>sem carros</span><i>✺</i><span>ruas de areia</span><i>✺</i><span>travessia de canoa</span><i>✺</i><span>forró pé de serra</span><i>✺</i><span>rio e mar</span><i>✺</i><span>céu de estrelas</span><i>✺</i><span>pé descalço</span><i>✺</i>
+      </div>
+    </div>
+
+    <!-- ============================== ACOMODAÇÕES ============================== -->
+    <section class="section rooms" id="acomodacoes">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Acomodações</p>
+            <h2 class="h2">Seu quarto,<br /><em>feito para ficar.</em></h2>
+          </div>
+          <p class="muted section-head__aside">
+            Conforto essencial, materiais naturais e a sensação boa de estar exatamente onde
+            você deveria. Café da manhã incluso em todas as acomodações.
+          </p>
+        </div>
+        <div class="rooms__grid" id="roomsGrid"><!-- renderizado por app.js --></div>
+      </div>
+    </section>
+
+    <!-- ============================== CARAÍVA ============================== -->
+    <section class="section caraiva" id="caraiva">
+      <div class="container">
+        <div class="section-head section-head--light">
+          <div>
+            <p class="eyebrow eyebrow--light">Viva Caraíva</p>
+            <h2 class="h2 h2--light">Um lugar onde<br /><em>o relógio esquece de funcionar.</em></h2>
+          </div>
+          <p class="section-head__aside light-muted">
+            Distrito de Porto Seguro, no extremo sul da Bahia, Caraíva é uma das vilas mais
+            antigas do Brasil — e uma das poucas que continuam do jeitinho que eram.
+          </p>
+        </div>
+
+        <div class="facts">
+          <article class="fact reveal">
+            <span class="fact__n hand">01</span>
+            <h3>Sem carros</h3>
+            <p>Os carros ficam do outro lado do rio, em Nova Caraíva. Do lado de cá, ninguém buzina: a vila se anda a pé, descalço.</p>
+          </article>
+          <article class="fact reveal">
+            <span class="fact__n hand">02</span>
+            <h3>Chegada de canoa</h3>
+            <p>A travessia é feita em canoas a remo conduzidas pelos barqueiros da vila. São poucos minutos — e você já está em outro ritmo.</p>
+          </article>
+          <article class="fact reveal">
+            <span class="fact__n hand">03</span>
+            <h3>Ruas de areia</h3>
+            <p>Em Caraíva não existe asfalto: as ruas são de areia e a fiação elétrica é subterrânea, então não há postes. No caminho, casinhas coloridas, bares e lojinhas de artesanato.</p>
+          </article>
+          <article class="fact reveal">
+            <span class="fact__n hand">04</span>
+            <h3>Céu de estrelas</h3>
+            <p>A energia elétrica só chegou em 2007. Até hoje as noites são escuras o bastante para ver a Via Láctea da areia.</p>
+          </article>
+          <article class="fact reveal">
+            <span class="fact__n hand">05</span>
+            <h3>Rio + mar</h3>
+            <p>De um lado, o rio de águas calmas, mornas e cor de chá; do outro, o mar aberto com ondas. Na Praia da Barra eles se encontram.</p>
+          </article>
+          <article class="fact reveal">
+            <span class="fact__n hand">06</span>
+            <h3>Natureza preservada</h3>
+            <p>A vila fica perto do Parque Nacional do Monte Pascoal e da Reserva Marinha do Corumbau. A região também é território do povo Pataxó, que vive em aldeias nos arredores.</p>
+          </article>
+        </div>
+
+        <figure class="caraiva__wide reveal">
+          <img src="assets/img/canoas-por-do-sol.jpg" alt="Canoas coloridas atracadas no Rio Caraíva ao pôr do sol, com o mangue ao fundo" loading="lazy" />
+          <figcaption>
+            <span class="hand">fim de tarde no rio</span>
+            <span>O pôr do sol de Caraíva acontece no rio — e é tradição assistir da beira, com os pés na água.</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ============================== EXPERIÊNCIAS ============================== -->
+    <section class="section exp" id="experiencias">
+      <div class="container exp__grid">
+        <div>
+          <p class="eyebrow">Experiências</p>
+          <h2 class="h2">Cada dia aqui<br /><em>é uma descoberta.</em></h2>
+          <p class="lead">
+            Da boia no rio ao forró na areia: a gente indica, agenda e conecta você aos
+            guias e barqueiros locais.
+          </p>
+          <ol class="exp__list">
+            <li><span class="hand">boia</span><div><h3>Descer o rio de boia</h3><p>Deixe a correnteza do Rio Caraíva levar você até a Praia da Barra, onde rio e mar se encontram.</p></div></li>
+            <li><span class="hand">canoa</span><div><h3>Pôr do sol de canoa</h3><p>Remadores da vila conduzem pelo rio e pelo mangue na hora mais dourada do dia.</p></div></li>
+            <li><span class="hand">praias</span><div><h3>Satu &amp; Corumbau</h3><p>4 km a pé pela areia até o Satu, ou barco até a Ponta do Corumbau e suas piscinas naturais na maré baixa.</p></div></li>
+            <li><span class="hand">raízes</span><div><h3>Cultura Pataxó</h3><p>Vivências com guias indígenas em aldeias da região: trilhas, pintura corporal e artesanato.</p></div></li>
+            <li><span class="hand">forró</span><div><h3>Forró pé de serra</h3><p>Sanfona, zabumba e triângulo: as noites de Caraíva são para dançar na areia até tarde.</p></div></li>
+          </ol>
+        </div>
+        <div class="exp__collage">
+          <figure class="c1"><img src="assets/img/canoas-por-do-sol.jpg" alt="Canoas no rio ao entardecer" loading="lazy" /></figure>
+          <figure class="c2"><img src="assets/img/jardim-redes.jpg" alt="Redes laranjas no jardim da pousada" loading="lazy" /></figure>
+          <figure class="c3"><img src="assets/img/aerea-rio-mar.jpg" alt="Ponta de areia entre o rio e o mar" loading="lazy" /></figure>
+          <span class="exp__note hand">prepare o chinelo ☀</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== GALERIA ============================== -->
+    <section class="section gallery" id="galeria">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Galeria</p>
+            <h2 class="h2">Um pouco da <em>Praia Mar</em></h2>
+          </div>
+          <p class="muted section-head__aside">Toque nas fotos para ampliar.</p>
+        </div>
+        <div class="gallery__grid">
+          <button class="g g--tall" data-lightbox="0"><img src="assets/img/aerea-rio-mar.jpg" alt="Vista aérea do encontro do rio com o mar em Caraíva" loading="lazy" /></button>
+          <button class="g g--wide" data-lightbox="1"><img src="assets/img/canoas-por-do-sol.jpg" alt="Canoas coloridas no Rio Caraíva" loading="lazy" /></button>
+          <button class="g" data-lightbox="2"><img src="assets/img/suite-dossel.jpg" alt="Suíte com cama de dossel" loading="lazy" /></button>
+          <button class="g" data-lightbox="3"><img src="assets/img/jardim-redes.jpg" alt="Redes no jardim tropical" loading="lazy" /></button>
+          <button class="g g--wide" data-lightbox="4"><img src="assets/img/chale-sala.jpg" alt="Sala colorida do chalé com rede e sofás" loading="lazy" /></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== DEPOIMENTOS ============================== -->
+    <section class="section reviews" id="depoimentos">
+      <div class="container">
+        <div class="reviews__layout">
+          <div class="reviews__score">
+            <p class="eyebrow eyebrow--light">Avaliações</p>
+            <h2 class="h2 h2--light">Chegue como hóspede.<br /><em>Parta como amigo.</em></h2>
+            <div class="gscore" id="gScore"><!-- renderizado por app.js --></div>
+          </div>
+          <div class="reviews__grid" id="reviewsGrid"><!-- renderizado por app.js --></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== COMO CHEGAR ============================== -->
+    <section class="section route" id="como-chegar">
+      <div class="container route__grid">
+        <div>
+          <p class="eyebrow">Como chegar</p>
+          <h2 class="h2">A viagem já<br /><em>faz parte do passeio.</em></h2>
+          <ol class="steps">
+            <li><b>Aeroporto de Porto Seguro</b><span>O aeroporto mais próximo, com voos das principais capitais.</span></li>
+            <li><b>≈ 70 km de estrada</b><span>Cerca de 2h30 de carro, com um trecho de terra. Na época de chuva, prefira 4x4 — ou o nosso transfer.</span></li>
+            <li><b>Nova Caraíva</b><span>Estacione na margem do rio: carro não atravessa.</span></li>
+            <li><b>Travessia de canoa</b><span>Poucos minutos de remo até a vila. Avise a gente que ajudamos com tudo.</span></li>
+            <li><b>Aldeia Xandó</b><span>As malas vão de carroça pelas ruas de areia até a pousada, no coração de Caraíva.</span></li>
+          </ol>
+        </div>
+        <div class="route__mapwrap">
+          <div class="route__map">
+            <iframe id="mapFrame" title="Localização da Pousada Praia Mar em Caraíva" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q=-16.8110084,-39.1469225&z=17&output=embed"></iframe>
+          </div>
+          <div class="addr-card">
+            <img src="assets/img/logo-praia-mar.jpg" alt="" width="52" height="52" />
+            <div>
+              <b>Praia Mar Pousada</b>
+              <span id="addrText">Aldeia Xandó, R. Pedro Marcelino — Caraíva, Porto Seguro - BA</span>
+            </div>
+            <a class="btn btn--coral" id="routeBtn" href="https://maps.app.goo.gl/HbFNayxW56uMY3bz9" target="_blank" rel="noopener">Como chegar ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== CTA FINAL ============================== -->
+    <section class="cta">
+      <div class="container cta__inner">
+        <p class="hand cta__hand">o rio está esperando</p>
+        <h2 class="h2 h2--light">Bora pra Caraíva?</h2>
+        <p class="light-muted">Escolha as datas, garanta o seu quarto com Pix e receba a confirmação na hora.</p>
+        <button class="btn btn--sun btn--lg" data-open-booking>Reservar minha estadia</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================== FOOTER ============================== -->
+  <footer class="footer" id="contato">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <a href="#topo" class="brand brand--light">
+          <img class="brand__mark" src="assets/img/logo-praia-mar.jpg" alt="" width="46" height="46" />
+          <span class="brand__text">
+            <span class="brand__name">Praia Mar</span>
+            <span class="brand__sub">Pousada · Caraíva</span>
+          </span>
+        </a>
+        <p>Hospedagem pé na areia entre o rio e o mar, na vila de Caraíva — Porto Seguro, Bahia.</p>
+      </div>
+      <div>
+        <p class="footer__title">Navegar</p>
+        <a href="#acomodacoes">Acomodações</a>
+        <a href="#caraiva">Caraíva</a>
+        <a href="#experiencias">Experiências</a>
+        <a href="#" data-open-policy>Políticas da reserva</a>
+      </div>
+      <div>
+        <p class="footer__title">Contato</p>
+        <a href="#" data-wa id="footWa">WhatsApp</a>
+        <a href="#" id="footMail">E-mail</a>
+        <a href="#" id="footInsta" target="_blank" rel="noopener">Instagram</a>
+        <span id="footAddr"></span>
+      </div>
+    </div>
+    <div class="container footer__bottom">
+      <span>© <span id="year"></span> Pousada Praia Mar · Todos os direitos reservados</span>
+      <span class="hand">o mar fica perto. o tempo também.</span>
+    </div>
+  </footer>
+
+  <!-- ============================== MODAIS ============================== -->
+  <!-- Detalhes do quarto -->
+  <div class="modal" id="roomModal" role="dialog" aria-modal="true" aria-labelledby="roomModalTitle" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel modal__panel--room">
+      <button class="modal__close" data-close aria-label="Fechar">×</button>
+      <div id="roomModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox__close" data-close aria-label="Fechar">×</button>
+    <button class="lightbox__nav lightbox__prev" aria-label="Anterior">‹</button>
+    <img id="lightboxImg" alt="" />
+    <button class="lightbox__nav lightbox__next" aria-label="Próxima">›</button>
+  </div>
+
+  <!-- Políticas -->
+  <div class="modal" id="policyModal" role="dialog" aria-modal="true" aria-labelledby="policyTitle" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel modal__panel--narrow">
+      <button class="modal__close" data-close aria-label="Fechar">×</button>
+      <h3 class="h3" id="policyTitle">Políticas da reserva</h3>
+      <div class="policy" id="policyBody"></div>
+    </div>
+  </div>
+
+  <!-- Fluxo de reserva -->
+  <div class="modal booking" id="booking" role="dialog" aria-modal="true" aria-labelledby="bookingTitle" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel modal__panel--booking">
+      <header class="bk-head">
+        <div>
+          <p class="eyebrow">Reserva online</p>
+          <h3 class="h3" id="bookingTitle">Sua estadia em Caraíva</h3>
+        </div>
+        <button class="modal__close modal__close--static" data-close aria-label="Fechar reserva">×</button>
+      </header>
+      <ol class="bk-steps" id="bkSteps">
+        <li data-s="1"><span>1</span>Datas</li>
+        <li data-s="2"><span>2</span>Quarto</li>
+        <li data-s="3"><span>3</span>Seus dados</li>
+        <li data-s="4"><span>4</span>Pagamento</li>
+        <li data-s="5"><span>5</span>Confirmação</li>
+      </ol>
+      <div class="bk-body">
+        <div class="bk-main" id="bkMain"></div>
+        <aside class="bk-summary" id="bkSummary"></aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================== CHAT ============================== -->
+  <div class="chat" id="chat">
+    <div class="chat__bubble" id="chatBubble">Oi! Posso ajudar? 🌊</div>
+    <button class="chat__fab" id="chatFab" aria-label="Abrir atendimento">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+    </button>
+    <div class="chat__panel" id="chatPanel" hidden>
+      <header class="chat__head">
+        <img class="brand__mark" src="assets/img/logo-praia-mar.jpg" alt="" width="46" height="46" />
+        <div>
+          <b>Maré · atendimento</b>
+          <span><i class="online"></i> responde na hora</span>
+        </div>
+        <a class="chat__wa" href="#" data-wa title="Falar no WhatsApp">WhatsApp</a>
+      </header>
+      <div class="chat__msgs" id="chatMsgs"></div>
+      <div class="chat__chips" id="chatChips"></div>
+      <form class="chat__form" id="chatForm">
+        <input id="chatInput" placeholder="Pergunte sobre quartos, travessia…" autocomplete="off" />
+        <button aria-label="Enviar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/vendor/qrcode.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/booking.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
