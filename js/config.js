@@ -51,6 +51,13 @@ window.PM_CONFIG = {
      n8n, Make, Zapier, Google Apps Script...). Vazio = só WhatsApp.      */
   webhookUrl: "",
 
+  /* ---------------- PAINEL ADM (Firebase) ------------------------------
+     Projeto do Firebase do painel: cada reserva concluída aparece lá em
+     "pedidos_site". Vazio = não envia.                                    */
+  nuvem: {
+    projectId: "pousada-praia-mar",
+  },
+
   /* ---------------- ACOMODAÇÕES ----------------------------------------
      preco = diária POR PESSOA, com café da manhã (vale até tarifaValidaAte)
      unidades = quantos quartos iguais a pousada tem desse tipo           */

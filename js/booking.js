@@ -427,6 +427,7 @@
     if (C.webhookUrl) {
       fetch(C.webhookUrl, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(r) }).catch(() => {});
     }
+    window.PMPedidos?.enviar(r); // envia ao painel ADM (js/pedidos.js)
     state.reserva = r;
     clearInterval(timerId);
     go(5);
