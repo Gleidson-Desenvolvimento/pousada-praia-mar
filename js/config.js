@@ -210,7 +210,7 @@ window.PM_CONFIG = {
      (inclusive). Depois dela, só têm preço as noites que estiverem dentro
      de alguma TEMPORADA (abaixo). Noites sem preço aparecem como "—" no
      calendário e o hóspede é levado ao WhatsApp.                          */
-  tarifaValidaAte: "2026-12-25",
+  tarifaValidaAte: "2026-12-26",
 
   /* Crianças com até esta idade (inclusive) NÃO pagam diária.
      Elas continuam contando na capacidade do quarto (ocupam cama).       */
