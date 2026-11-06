@@ -3,11 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pousada Praia Mar · Caraíva, Bahia — entre o rio e o mar</title>
-  <meta name="description" content="Pousada pé na areia em Caraíva, Bahia. Vila sem carros, ruas de areia, travessia de canoa e o encontro do rio com o mar. Reserve online com Pix." />
-  <meta property="og:title" content="Pousada Praia Mar · Caraíva" />
+  <title>Pousada em Caraíva, Porto Seguro (BA) | Pousada Praia Mar</title>
+  <meta name="description" content="Pousada em Caraíva, Porto Seguro, Bahia, a poucos passos da praia, entre o rio e o mar. Quartos e suítes com café da manhã. Veja datas e reserve online." />
+  <link rel="canonical" href="https://gleidson-desenvolvimento.github.io/pousada-praia-mar/" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:site_name" content="Pousada Praia Mar" />
+  <meta property="og:url" content="https://gleidson-desenvolvimento.github.io/pousada-praia-mar/" />
+  <meta property="og:title" content="Pousada em Caraíva, Porto Seguro (BA) | Pousada Praia Mar" />
   <meta property="og:description" content="Entre o rio e o mar, o tempo anda descalço. Reserve sua estadia em Caraíva." />
-  <meta property="og:image" content="assets/img/aerea-rio-mar.jpg" />
+  <meta property="og:image" content="https://gleidson-desenvolvimento.github.io/pousada-praia-mar/assets/img/aerea-rio-mar.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#1f2660" />
   <link rel="icon" href="assets/img/favicon-32.png" type="image/png" sizes="32x32" />
   <link rel="icon" href="assets/img/favicon-48.png" type="image/png" sizes="48x48" />
@@ -16,7 +23,77 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preload" as="image" href="assets/video/caraiva-poster.jpg" fetchpriority="high" />
   <link rel="stylesheet" href="css/style.css" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BedAndBreakfast",
+  "@id": "https://gleidson-desenvolvimento.github.io/pousada-praia-mar/#pousada",
+  "name": "Pousada Praia Mar",
+  "alternateName": "Praia Mar Pousada",
+  "description": "Pousada em Caraíva, no município de Porto Seguro, Bahia, entre o rio e o mar. Quartos e suítes com café da manhã incluso.",
+  "url": "https://gleidson-desenvolvimento.github.io/pousada-praia-mar/",
+  "image": [
+    "https://gleidson-desenvolvimento.github.io/pousada-praia-mar/assets/img/aerea-rio-mar.jpg",
+    "https://gleidson-desenvolvimento.github.io/pousada-praia-mar/assets/img/jardim-redes.jpg",
+    "https://gleidson-desenvolvimento.github.io/pousada-praia-mar/assets/img/chale-sala.jpg"
+  ],
+  "logo": "https://gleidson-desenvolvimento.github.io/pousada-praia-mar/assets/img/logo-praia-mar.jpg",
+  "telephone": "+55-73-99150-2165",
+  "email": "praiamarpousadacaraiva@hotmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "R. Pedro Marcelino, Aldeia Xandó, Caraíva",
+    "addressLocality": "Porto Seguro",
+    "addressRegion": "BA",
+    "postalCode": "45810-000",
+    "addressCountry": "BR"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": -16.810558,
+    "longitude": -39.1470621
+  },
+  "hasMap": "https://maps.google.com/?cid=456902039530879537",
+  "sameAs": [
+    "https://maps.google.com/?cid=456902039530879537"
+  ],
+  "checkinTime": "14:00",
+  "checkoutTime": "11:00",
+  "numberOfRooms": 6,
+  "priceRange": "R$ 125 a R$ 1.300 por pessoa/noite",
+  "currenciesAccepted": "BRL",
+  "availableLanguage": "pt-BR",
+  "amenityFeature": [
+    {
+      "@type": "LocationFeatureSpecification",
+      "name": "Café da manhã incluso",
+      "value": true
+    },
+    {
+      "@type": "LocationFeatureSpecification",
+      "name": "Wi-Fi",
+      "value": true
+    },
+    {
+      "@type": "LocationFeatureSpecification",
+      "name": "Ar-condicionado nas suítes",
+      "value": true
+    },
+    {
+      "@type": "LocationFeatureSpecification",
+      "name": "Jardim",
+      "value": true
+    },
+    {
+      "@type": "LocationFeatureSpecification",
+      "name": "Redes",
+      "value": true
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
@@ -55,25 +132,24 @@
   <main id="topo">
     <!-- ============================== HERO ============================== -->
     <section class="hero">
-      <video class="hero__video" id="heroVideo" autoplay muted loop playsinline preload="auto"
-             poster="assets/video/caraiva-poster.jpg">
-        <source src="assets/video/caraiva-loop.mp4" type="video/mp4" />
+      <video class="hero__video" id="heroVideo" muted loop playsinline preload="none" poster="assets/video/caraiva-poster.jpg" aria-hidden="true">
+        <source data-src="assets/video/caraiva-loop.mp4" type="video/mp4" />
       </video>
       <div class="hero__shade"></div>
       <div class="hero__grain"></div>
 
       <div class="container hero__content">
-        <p class="pill pill--glass reveal">
-          <span class="dot"></span> Caraíva · Porto Seguro · Bahia
-        </p>
-        <h1 class="hero__title reveal">
-          Seu tempo<br /><em>desacelera aqui.</em>
+        <h1 class="pill pill--glass hero__kicker">
+          <span class="dot"></span> Pousada em Caraíva · Porto Seguro · Bahia
         </h1>
-        <p class="hero__lead reveal">
+        <p class="hero__title">
+          Seu tempo<br /><em>desacelera aqui.</em>
+        </p>
+        <p class="hero__lead">
           Uma pousada íntima entre o rio e o mar, feita para quem quer trocar
           o barulho do mundo pelo som das ondas.
         </p>
-        <div class="hero__actions reveal">
+        <div class="hero__actions">
           <button class="btn btn--sun btn--lg" data-open-booking>Ver disponibilidade</button>
           <a href="#acomodacoes" class="btn btn--ghost btn--lg">Conhecer os quartos</a>
         </div>
@@ -153,7 +229,7 @@
       <div class="container">
         <div class="section-head">
           <div>
-            <p class="eyebrow">Acomodações</p>
+            <p class="eyebrow">Acomodações em Caraíva</p>
             <h2 class="h2">Seu quarto,<br /><em>feito para ficar.</em></h2>
           </div>
           <p class="muted section-head__aside">
@@ -161,7 +237,16 @@
             você deveria. Café da manhã incluso em todas as acomodações.
           </p>
         </div>
-        <div class="rooms__grid" id="roomsGrid"><!-- renderizado por app.js --></div>
+        <div class="rooms__grid" id="roomsGrid"><!-- app.js troca esta lista pelos cartões completos; ela fica para buscadores e navegadores sem JavaScript -->
+          <ul class="rooms__static">
+            <li><strong>Suíte Baixú:</strong> até 3 pessoas, 1 cama queen e 1 de solteiro, vista para o jardim.</li>
+            <li><strong>Suíte Auê:</strong> até 5 pessoas, 1 cama king e 3 de solteiro, vista para o jardim.</li>
+            <li><strong>Suíte Hahâu:</strong> até 2 pessoas, 1 cama queen, vista para a varanda.</li>
+            <li><strong>Suíte Hayô:</strong> até 5 pessoas, 1 cama queen e 3 de solteiro, vista para a varanda.</li>
+            <li><strong>Quarto Maion:</strong> até 3 pessoas, 1 cama de casal e 1 de solteiro.</li>
+            <li><strong>Suíte Angorró:</strong> até 4 pessoas, 1 cama king e 2 de solteiro.</li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -226,7 +311,7 @@
     <section class="section exp" id="experiencias">
       <div class="container exp__grid">
         <div>
-          <p class="eyebrow">Experiências</p>
+          <p class="eyebrow">O que fazer em Caraíva</p>
           <h2 class="h2">Cada dia aqui<br /><em>é uma descoberta.</em></h2>
           <p class="lead">
             Da boia no rio ao forró na areia: a gente indica, agenda e conecta você aos
@@ -291,7 +376,7 @@
     <section class="section route" id="como-chegar">
       <div class="container route__grid">
         <div>
-          <p class="eyebrow">Como chegar</p>
+          <p class="eyebrow">Como chegar a Caraíva</p>
           <h2 class="h2">A viagem já<br /><em>faz parte do passeio.</em></h2>
           <ol class="steps">
             <li><b>Aeroporto de Porto Seguro</b><span>O aeroporto mais próximo, com voos das principais capitais.</span></li>
@@ -300,6 +385,7 @@
             <li><b>Travessia de canoa</b><span>Poucos minutos de remo até a vila. Avise a gente que ajudamos com tudo.</span></li>
             <li><b>Aldeia Xandó</b><span>As malas vão de carroça pelas ruas de areia até a pousada, no coração de Caraíva.</span></li>
           </ol>
+          <p class="route__guides">Guias: <a href="como-chegar-a-caraiva.html">Como chegar saindo de Porto Seguro</a> · <a href="trancoso-a-caraiva.html">De Trancoso a Caraíva</a></p>
         </div>
         <div class="route__mapwrap">
           <div class="route__map">
@@ -314,6 +400,24 @@
             </div>
             <a class="btn btn--coral" id="routeBtn" href="https://maps.google.com/?cid=456902039530879537&amp;entry=gps&amp;g_st=ac" target="_blank" rel="noopener">Como chegar ↗</a>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== PERGUNTAS FREQUENTES ============================== -->
+    <section class="section faq" id="perguntas">
+      <div class="container faq__inner">
+        <p class="eyebrow">Perguntas frequentes</p>
+        <h2 class="h2">Antes de vir para <em>Caraíva</em></h2>
+        <div class="faq__list">
+          <details><summary>Onde fica a Pousada Praia Mar?</summary><p>Na Aldeia Xandó, R. Pedro Marcelino, na vila de Caraíva, no município de Porto Seguro, sul da Bahia. A praia fica a poucos passos, entre o rio e o mar.</p></details>
+          <details><summary>Qual a distância de Porto Seguro até Caraíva?</summary><p>Cerca de 60 a 70 km pela rota com balsa, ou 2h a 2h30 de carro, com trecho de terra. Veja o <a href="como-chegar-a-caraiva.html">guia para chegar saindo de Porto Seguro</a>.</p></details>
+          <details><summary>Dá para ir de Trancoso a Caraíva?</summary><p>Sim. São cerca de 36 km de estrada de terra, mais de 1 hora de carro na seca. Veja o <a href="trancoso-a-caraiva.html">guia de Trancoso a Caraíva</a>.</p></details>
+          <details><summary>O café da manhã está incluso?</summary><p>Sim. O café da manhã está incluso em todos os quartos e suítes.</p></details>
+          <details><summary>Criança paga diária?</summary><p>Crianças de até 10 anos não pagam diária, mas contam na capacidade do quarto.</p></details>
+          <details><summary>Qual o horário de check-in e check-out?</summary><p>Check-in a partir das 14h e check-out até as 11h.</p></details>
+          <details><summary>O Réveillon tem estadia mínima?</summary><p>Sim. Em reservas que incluem noites de Réveillon, a estadia mínima é de 3 diárias. As datas e os valores aparecem no calendário da reserva.</p></details>
+          <details><summary>Como faço a reserva?</summary><p>Escolha as datas no calendário, selecione o quarto e pague pelo site. Se preferir, fale com a gente pelo <a href="https://wa.me/5573991502165" target="_blank" rel="noopener">WhatsApp</a>.</p></details>
         </div>
       </div>
     </section>
@@ -347,7 +451,14 @@
         <a href="#acomodacoes">Acomodações</a>
         <a href="#caraiva">Caraíva</a>
         <a href="#experiencias">Experiências</a>
+        <a href="#perguntas">Perguntas frequentes</a>
         <a href="#" data-open-policy>Políticas da reserva</a>
+      </div>
+      <div>
+        <p class="footer__title">Guias de viagem</p>
+        <a href="como-chegar-a-caraiva.html">Como chegar saindo de Porto Seguro</a>
+        <a href="trancoso-a-caraiva.html">De Trancoso a Caraíva</a>
+        <a href="o-que-fazer-em-caraiva.html">O que fazer em Caraíva</a>
       </div>
       <div>
         <p class="footer__title">Contato</p>

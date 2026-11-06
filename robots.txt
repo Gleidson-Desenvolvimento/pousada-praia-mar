@@ -1,0 +1,5 @@
+# Só tem efeito quando o site estiver na raiz de um domínio próprio.
+User-agent: *
+Allow: /
+
+Sitemap: https://gleidson-desenvolvimento.github.io/pousada-praia-mar/sitemap.xml

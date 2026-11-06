@@ -57,3 +57,15 @@ são **sugestões** — revise antes de publicar. As políticas ficam em `js/app
 
 ## Logo
 `assets/img/logo-praia-mar.jpg` — usada no menu, rodapé, chat, mapa e ícone da aba.
+
+## SEO
+
+Os textos de busca ficam direto nos arquivos, não no `config.js`:
+
+- `index.html`: título, descrição, dados estruturados (bloco `application/ld+json`), perguntas frequentes e lista de quartos sem JavaScript.
+- `como-chegar-a-caraiva.html`, `trancoso-a-caraiva.html` e `o-que-fazer-em-caraiva.html`: guias de viagem.
+- `sitemap.xml` e `robots.txt`.
+
+**Se mudar preço, regra ou quarto**, confira também `priceRange` e `numberOfRooms` no `index.html`, as perguntas frequentes e os guias.
+
+**Ao trocar para um domínio próprio**, substitua `https://gleidson-desenvolvimento.github.io/pousada-praia-mar/` pelo endereço novo em todos os arquivos `.html`, no `sitemap.xml` e no `robots.txt`.

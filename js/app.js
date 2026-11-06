@@ -80,8 +80,23 @@
     icon.setAttribute("d", p ? "M8 5v14l11-7z" : "M7 5h3v14H7zM14 5h3v14h-3z");
     toggle.setAttribute("aria-label", p ? "Reproduzir vídeo" : "Pausar vídeo");
   };
-  toggle.addEventListener("click", () => setPaused(!video.paused));
+  // o vídeo só começa a baixar depois da página pronta: a foto de capa aparece primeiro e o site abre mais rápido
+  const carregarVideo = () => {
+    const s = $("source", video);
+    if (!s.dataset.src) return;
+    // celular baixa a versão mais leve do vídeo
+    s.src = window.innerWidth <= 820 ? s.dataset.src.replace(".mp4", "-mobile.mp4") : s.dataset.src;
+    s.removeAttribute("data-src");
+    video.load();
+  };
+  toggle.addEventListener("click", () => { carregarVideo(); setPaused(!video.paused); });
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPaused(true);
+  const iniciarVideo = () => setTimeout(() => {
+    if (navigator.connection?.saveData || toggle.getAttribute("aria-label") === "Reproduzir vídeo") return;
+    carregarVideo();
+    video.play().catch(() => {});
+  }, 1500);
+  document.readyState === "complete" ? iniciarVideo() : window.addEventListener("load", iniciarVideo);
   // economiza bateria: pausa quando o hero sai da tela
   new IntersectionObserver(([e]) => {
     if (toggle.getAttribute("aria-label") === "Reproduzir vídeo") return;
@@ -131,7 +146,7 @@
   $("#roomsGrid").innerHTML = C.quartos.map((q) => `
     <article class="room-card reveal">
       <div class="room-card__img">
-        <img src="${q.img}" alt="${esc(q.nome)}" loading="lazy" />
+        <img src="${q.img}" alt="${esc(q.nome)} na Pousada Praia Mar, em Caraíva" loading="lazy" />
         ${q.tag ? `<span class="tag">${esc(q.tag)}</span>` : ""}
       </div>
       <div class="room-card__body">
@@ -446,4 +461,7 @@
   setTimeout(() => bubble.classList.add("hide"), 9000);
   $("#chatChips").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) send(b.textContent); });
   $("#chatForm").addEventListener("submit", (e) => { e.preventDefault(); send(input.value); });
+
+  /* link vindo dos guias de viagem */
+  if (location.hash === "#reservar") window.PMBooking.open();
 })();

@@ -1,0 +1,65 @@
+/* =====================================================================
+   POUSADA PRAIA MAR — Guias de viagem (páginas de texto, sem JavaScript)
+   ===================================================================== */
+:root {
+  --anil: #34409a;
+  --anil-deep: #1f2660;
+  --coral: #e0573a;
+  --coral-dark: #c4452b;
+  --sol: #f2a93b;
+  --areia: #f7efe1;
+  --ink: #23203a;
+  --muted: #6b604f;
+  --border: #e3d5bb;
+  --white: #fffdf8;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Outfit", system-ui, -apple-system, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--areia); color: var(--ink); font: 400 17px/1.65 var(--font-body); }
+a { color: var(--anil); }
+img { max-width: 100%; height: auto; display: block; }
+
+.guia-top {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 12px clamp(18px, 5vw, 48px); background: var(--white); border-bottom: 1px solid var(--border);
+}
+.guia-top__brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-family: var(--font-display); font-size: 18px; }
+.guia-top__brand img { border-radius: 50%; }
+.guia-btn {
+  display: inline-block; padding: 10px 20px; border-radius: 999px; background: var(--sol); color: var(--ink);
+  font-weight: 500; font-size: 15px; text-decoration: none;
+}
+.guia-btn:hover { background: #e79a26; }
+.guia-btn--grande { padding: 14px 28px; font-size: 16px; }
+
+.guia { width: min(760px, 100% - 40px); margin: 0 auto; padding: 28px 0 64px; }
+.guia__trilha { font-size: 14px; color: var(--muted); margin-bottom: 26px; }
+.guia__eyebrow { margin: 0 0 8px; color: var(--coral-dark); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
+.guia h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 6vw, 48px); line-height: 1.12; letter-spacing: -.02em; margin: 0 0 10px; color: var(--anil-deep); }
+.guia__data { margin: 0 0 24px; color: var(--muted); font-size: 14px; }
+.guia__foto { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 18px; margin-bottom: 28px; }
+.guia__lead { font-size: 19px; line-height: 1.55; margin: 0 0 12px; }
+.guia h2 { font-family: var(--font-display); font-weight: 500; font-size: clamp(23px, 3.6vw, 28px); line-height: 1.2; margin: 38px 0 10px; color: var(--anil-deep); }
+.guia ul { padding-left: 20px; }
+.guia li { margin-bottom: 8px; }
+
+.guia__tabela { overflow-x: auto; margin: 14px 0; border: 1px solid var(--border); border-radius: 12px; background: var(--white); }
+.guia__tabela table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.guia__tabela th, .guia__tabela td { padding: 11px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+.guia__tabela tr:last-child td { border-bottom: 0; }
+.guia__tabela th { font-weight: 500; color: var(--anil-deep); }
+@media (max-width: 480px) { .guia__tabela table { font-size: 14px; } .guia__tabela th, .guia__tabela td { padding: 9px 10px; } }
+
+.guia__cta { margin-top: 48px; padding: 28px; border-radius: 18px; background: var(--anil-deep); color: #fff; }
+.guia__cta h2 { margin-top: 0; color: #fff; }
+.guia__cta p { margin: 0 0 18px; color: rgba(255,255,255,.88); }
+.guia__wa { margin-left: 16px; color: #fff; white-space: nowrap; }
+
+.guia-rodape {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px;
+  padding: 28px clamp(18px, 5vw, 48px); background: var(--anil-deep); color: rgba(255,255,255,.85); font-size: 15px;
+}
+.guia-rodape a { color: #fff; }
+.guia-rodape__links { display: flex; flex-direction: column; gap: 6px; }
