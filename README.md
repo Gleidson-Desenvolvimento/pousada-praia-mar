@@ -17,7 +17,7 @@ Para publicar, envie a pasta inteira para Netlify, Vercel, GitHub Pages, Hosting
 | Galeria em abas (Jardim, Sala de estar, Caraíva) | `galeria` |
 | Réveillon, janeiro, Carnaval… (preço por pessoa do período e mínimo de noites) | `temporadas` |
 | Datas já vendidas por fora (Booking, Airbnb, telefone) | `bloqueios` |
-| Extras (transfer, carroça, passeio…) | `extras` |
+| Extras (transfer, buggy, decoração…) | `extras` |
 | Nota do Google e link do perfil | `google` |
 | Avaliações em texto (copiadas do Google/Booking) | `depoimentos` |
 | Endereço e mapa | `pousada.endereco`, `mapaLink`, `mapaLat`, `mapaLng` |

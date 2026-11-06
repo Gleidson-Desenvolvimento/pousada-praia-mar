@@ -233,9 +233,8 @@ window.PM_CONFIG = {
   bloqueios: [],
 
   extras: [
-    { id: "transfer", nome: "Transfer aeroporto Porto Seguro ⇄ Nova Caraíva", preco: 380, tipo: "estadia", desc: "Ida e volta, carro com motorista local (até 4 pessoas)" },
-    { id: "carroca", nome: "Carroça para as malas na chegada", preco: 40, tipo: "estadia", desc: "Da beira do rio até a porta do quarto" },
-    { id: "barco", nome: "Passeio de barco até Corumbau", preco: 160, tipo: "pessoa", desc: "Saída pela manhã, retorno no fim da tarde" },
+    { id: "transfer", nome: "Transfer aeroporto Porto Seguro ⇄ Nova Caraíva", preco: 1100, tipo: "estadia", desc: "Ida e volta, carro com motorista local (até 4 pessoas)" },
+    { id: "buggy", nome: "Passeio de buggy até Corumbau", preco: 500, tipo: "estadia", desc: "Valor por passeio, para até 4 pessoas" },
     { id: "romantica", nome: "Decoração romântica", preco: 150, tipo: "estadia", desc: "Flores, espumante e pétalas na chegada" },
   ],
 
