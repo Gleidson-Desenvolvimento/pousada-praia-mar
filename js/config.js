@@ -15,9 +15,9 @@ window.PM_CONFIG = {
     email: "praiamarpousadacaraiva@hotmail.com",
     instagram: "",                       // sem @ — vazio esconde o link
     /* Localização (Google Maps) */
-    mapaLink: "https://maps.app.goo.gl/HbFNayxW56uMY3bz9",
-    mapaLat: -16.8110084,
-    mapaLng: -39.1469225,
+    mapaLink: "https://maps.google.com/?cid=456902039530879537&entry=gps&g_st=ac",
+    mapaLat: -16.810558,
+    mapaLng: -39.1470621,
     checkin: "14h",
     checkout: "11h",
   },
@@ -246,7 +246,7 @@ window.PM_CONFIG = {
   google: {
     nota: 5.0,
     total: null,   // ex.: 23 — quantidade de avaliações (null esconde)
-    linkAvaliacoes: "https://maps.app.goo.gl/HbFNayxW56uMY3bz9",
+    linkAvaliacoes: "https://maps.google.com/?cid=456902039530879537&entry=gps&g_st=ac",
     linkAvaliar: "",
   },
 
