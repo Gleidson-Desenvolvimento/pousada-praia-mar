@@ -23,8 +23,7 @@ Para publicar, envie a pasta inteira para Netlify, Vercel, GitHub Pages, Hosting
 | Endereço e mapa | `pousada.endereco`, `mapaLink`, `mapaLat`, `mapaLng` |
 | Receber cada reserva por e-mail/planilha automaticamente | `webhookUrl` |
 
-Os valores de diárias, áreas dos quartos, comodidades, extras e as políticas de cancelamento
-são **sugestões** — revise antes de publicar. As políticas ficam em `js/app.js`, procure por “políticas”.
+As políticas da reserva ficam em `js/app.js` (procure por “políticas”). As regras de cancelamento e de datas especiais aparecem só nessa seção; os prazos ficam em `cancelamentoDias`, no `js/config.js`.
 
 ## Como funciona a reserva
 1. **Datas**: calendário com preço por dia, temporadas e mínimo de noites.

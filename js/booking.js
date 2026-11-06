@@ -560,7 +560,7 @@
       <ul class="sum-lines">${lines}</ul>
       <div class="sum-total"><span>Total</span><b>${brl(q.total)}</b></div>
       ${state.step >= 4 ? `<ul class="sum-lines"><li><span>Pagar agora</span><span><b>${brl(q.agora)}</b></span></li>${q.restante > 0 ? `<li><span>No check-in</span><span>${brl(q.restante)}</span></li>` : ""}</ul>` : ""}
-      <p class="sum-note">✓ Café da manhã incluso<br/>✓ Cancelamento grátis até 15 dias antes<br/>✓ Check-in ${C.pousada.checkin} · Check-out ${C.pousada.checkout}</p>`;
+      <p class="sum-note">✓ Café da manhã incluso<br/>✓ Check-in ${C.pousada.checkin} · Check-out ${C.pousada.checkout}</p>`;
   }
 
   /* ---------------- navegação ---------------- */

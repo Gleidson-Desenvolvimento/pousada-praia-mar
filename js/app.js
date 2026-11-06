@@ -11,13 +11,23 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const waLink = (t) => `https://wa.me/${P.whatsapp}?text=${encodeURIComponent(t)}`;
   const localKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const dataCurta = (k) => new Date(k + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  // regras de cancelamento e datas especiais: aparecem só nas políticas da reserva
+  const prazoCancel = C.cancelamentoDias ?? 7;
+  const regraCancel = `Devolução integral em até ${prazoCancel} dias após a confirmação do pagamento; depois disso, a pousada retém um percentual definido.`;
+  const datasEspeciais = (C.temporadas || []).filter((t) => t.cancelamentoDias);
+  const prazoEspecial = datasEspeciais[0]?.cancelamentoDias;
+  const regraEspecial = datasEspeciais.length
+    ? `${datasEspeciais.map((t) => `${t.nome} (${dataCurta(t.inicio)} a ${dataCurta(t.fim)})`).join(" e ")}: cancelamento gratuito em até ${prazoEspecial} dias após a confirmação do pagamento; depois disso, a pousada retém um percentual definido.`
+    : "";
+  const regraMinimo = (C.temporadas || []).filter((t) => t.minNoites > 1).map((t) => `${t.nome}: estadia mínima de ${t.minNoites} diárias.`).join(" ");
   // temporadas com preço fixo ainda por vir (ex.: Réveillon, janeiro)
   const temporadasNota = () => {
     const hoje = localKey(new Date());
     const fmt = (k) => new Date(k + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
     const ts = (C.temporadas || []).filter((t) => t.preco && t.inicio.length > 5 && t.fim >= hoje);
     if (!ts.length) return "";
-    return `<p class="kids-note">📅 ${ts.map((t) => `${esc(t.nome)} (${fmt(t.inicio)} a ${fmt(t.fim)}): ${brl(t.preco)} por pessoa/noite${t.minNoites > 1 ? `, mín. ${t.minNoites} diárias` : ""}`).join(" · ")}</p>`;
+    return `<p class="kids-note">📅 ${ts.map((t) => `${esc(t.nome)} (${fmt(t.inicio)} a ${fmt(t.fim)}): ${brl(t.preco)} por pessoa/noite`).join(" · ")}</p>`;
   };
 
   /* ---------------- toast ---------------- */
@@ -226,12 +236,10 @@
     <h4>Garantia da reserva</h4>
     <p>A reserva é confirmada com o pagamento de ${pct}% do valor total (sinal) via Pix ou cartão. O restante é pago no check-in. Pagando 100% no Pix, você ganha ${Math.round(C.pix.descontoPagamentoTotal * 100)}% de desconto.</p>
     <h4>Cancelamento</h4>
-    <ul>
-      <li>Até 15 dias antes do check-in: devolução integral do valor pago.</li>
-      <li>De 14 a 7 dias antes: devolução de 50% ou crédito integral para nova data em até 12 meses.</li>
-      <li>Menos de 7 dias ou não comparecimento: sem devolução.</li>
-      <li>Pacotes de Réveillon e Carnaval não são reembolsáveis, mas podem ser transferidos para outra pessoa.</li>
-    </ul>
+    <p>${regraCancel}</p>
+    ${regraEspecial ? `<h4>Datas especiais</h4>
+    <p>${regraEspecial}</p>` : ""}
+    ${regraMinimo ? `<p>${regraMinimo}</p>` : ""}
     <h4>Crianças</h4>
     <p>Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam diária (contam na capacidade do quarto). A partir de ${(C.criancaGratisAte ?? 10) + 1} anos, paga a diária normal por pessoa.</p>
     <h4>Horários</h4>
@@ -379,7 +387,7 @@
   const precos = C.quartos.map((q) => `• ${q.nome}: ${brl(q.preco)} por pessoa/noite (até ${q.capacidade} pessoas)`).join("\n");
   const ddmm = (k) => new Date(k + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   const validade = C.tarifaValidaAte ? ddmm(C.tarifaValidaAte) : "";
-  const temporadasTxt = (C.temporadas || []).filter((t) => t.preco && t.inicio.length > 5).map((t) => `• ${t.nome} (${ddmm(t.inicio)} a ${ddmm(t.fim)}): ${brl(t.preco)} por pessoa/noite${t.minNoites > 1 ? `, mínimo de ${t.minNoites} diárias` : ""}`).join("\n");
+  const temporadasTxt = (C.temporadas || []).filter((t) => t.preco && t.inicio.length > 5).map((t) => `• ${t.nome} (${ddmm(t.inicio)} a ${ddmm(t.fim)}): ${brl(t.preco)} por pessoa/noite`).join("\n");
   const kb = [
     { k: ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "e ai"], r: "Oi! Que bom te ver por aqui 🌊 Quer saber sobre quartos, preços, como chegar em Caraíva ou já quer reservar?" },
     { k: ["quarto", "acomoda", "suite", "suíte", "chale", "chalé", "dossel"], r: `Temos ${C.quartos.length} acomodações, todas com café da manhã incluso:\n${precos}\nQuer ver a disponibilidade para as suas datas?`, a: "booking" },
@@ -388,7 +396,7 @@
     { k: ["endereco", "endereço", "onde fica", "localiza", "mapa", "xando", "xandó"], r: `Estamos na ${P.endereco}, no coração de Caraíva, a poucos passos da praia. Toque abaixo para abrir a rota no Google Maps 📍`, a: "map" },
     { k: ["check", "horario", "horário", "entrada", "saida", "saída"], r: `Check-in a partir das ${P.checkin} e check-out até as ${P.checkout}. Se chegar antes, guardamos suas malas e você já pode curtir a praia.` },
     { k: ["cafe", "café", "manha", "manhã", "refei", "comida", "tapioca"], r: "O café da manhã está incluso e é bem baiano: tapioca, cuscuz, frutas da estação, bolos caseiros, pães, ovos e café passado na hora ☕" },
-    { k: ["cancel", "reembolso", "desist", "politica", "política"], r: "Cancelando até 15 dias antes, devolvemos tudo. De 14 a 7 dias, 50% ou crédito integral para outra data. Com menos de 7 dias não há devolução. Réveillon e Carnaval não são reembolsáveis.", a: "policy" },
+    { k: ["cancel", "reembolso", "desist", "politica", "política"], r: "As regras de cancelamento estão nas políticas da reserva. Toque abaixo para ler.", a: "policy" },
     { k: ["pix", "pagamento", "pagar", "cartao", "cartão", "parcel", "sinal"], r: `Você garante a reserva com ${Math.round(C.sinal * 100)}% de sinal via Pix (QR Code na hora) ou cartão em até ${C.cartao.parcelasMax}x. Pagando 100% no Pix, ganha ${Math.round(C.pix.descontoPagamentoTotal * 100)}% de desconto. O restante é pago no check-in.` },
     { k: ["dinheiro", "saque", "caixa eletr", "banco", "especie", "espécie"], r: "Na vila as opções de saque são poucas, então vale levar algum dinheiro em espécie — principalmente para a travessia de canoa e os barqueiros. Na maioria dos lugares dá para pagar com Pix e cartão." },
     { k: ["pet", "cachorro", "gato", "animal"], r: "Sobre pets, cada caso a gente conversa direitinho. Me chama no WhatsApp que te respondo rapidinho 🐾", a: "wa" },

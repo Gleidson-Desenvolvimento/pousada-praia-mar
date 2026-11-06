@@ -216,14 +216,19 @@ window.PM_CONFIG = {
      Elas continuam contando na capacidade do quarto (ocupam cama).       */
   criancaGratisAte: 10,
 
+  /* Prazo para cancelar com devolução integral, contado da confirmação do
+     pagamento. Datas especiais usam cancelamentoDias da temporada.        */
+  cancelamentoDias: 7,
+
   /* TEMPORADAS — períodos com preço próprio.
      inicio / fim = primeira e ÚLTIMA NOITE do período ("AAAA-MM-DD").
      preco      = diária POR PESSOA com café, igual para todos os quartos
      (ou use multiplicador: 1.5 para aplicar sobre o preço de cada quarto)
-     minNoites  = estadia mínima quando a reserva pega alguma noite do período */
+     minNoites  = estadia mínima quando a reserva pega alguma noite do período
+     cancelamentoDias = prazo de cancelamento gratuito nessas datas especiais */
   temporadas: [
-    { nome: "Réveillon", inicio: "2026-12-27", fim: "2027-01-08", preco: 1300, minNoites: 3 },
-    { nome: "Janeiro", inicio: "2027-01-09", fim: "2027-01-31", preco: 500 },
+    { nome: "Réveillon", inicio: "2026-12-27", fim: "2027-01-08", preco: 1300, minNoites: 3, cancelamentoDias: 3 },
+    { nome: "Janeiro", inicio: "2027-01-09", fim: "2027-01-31", preco: 500, cancelamentoDias: 3 },
   ],
   minNoitesPadrao: 1,
 
