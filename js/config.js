@@ -219,6 +219,16 @@ window.PM_CONFIG = {
      a temporada tenha minPagantes próprio).                              */
   minPagantes: 2,
 
+  /* NOVA TARIFA — a partir de "inicio" (inclusive), sem data de fim, cada
+     quarto passa a ter este valor POR PESSOA (com a cobrança mínima de
+     minPagantes). As temporadas abaixo continuam valendo por cima dela.
+     150 = R$ 300 o casal (+150 por pessoa a partir da 3ª)
+     200 = R$ 400 o casal (+200 por pessoa a partir da 3ª)               */
+  novaTarifa: {
+    inicio: "2027-02-01",
+    precos: { maion: 150, baixu: 150, hahau: 150, angoro: 150, aue: 200, hayo: 200 },
+  },
+
   /* Crianças com até esta idade (inclusive) NÃO pagam diária.
      Elas continuam contando na capacidade do quarto (ocupam cama).       */
   criancaGratisAte: 10,
@@ -237,6 +247,8 @@ window.PM_CONFIG = {
   temporadas: [
     { nome: "Réveillon", inicio: "2026-12-27", fim: "2027-01-08", preco: 1300, minNoites: 3, cancelamentoDias: 3 },
     { nome: "Janeiro", inicio: "2027-01-09", fim: "2027-01-31", preco: 500, cancelamentoDias: 3 },
+    // Carnaval: R$ 1.100 o casal (550 por pessoa, mínimo de 2), + R$ 550 a partir da 3ª pessoa
+    { nome: "Carnaval", inicio: "2027-02-04", fim: "2027-02-09", preco: 550, minPagantes: 2, minNoites: 3, cancelamentoDias: 3 },
   ],
   minNoitesPadrao: 1,
 

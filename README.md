@@ -14,6 +14,7 @@ Para publicar, envie a pasta inteira para Netlify, Vercel, GitHub Pages, Hosting
 | Link de pagamento com cartão (Mercado Pago, InfinitePay…) | `cartao.linkPagamento` |
 | Quartos (Baixú, Auê, Hahâu, Hayô, Maion, Angorró): fotos, camas, vista, capacidade, preço POR PESSOA (cobrado no mínimo por 2 pessoas: `minPagantes`) | `quartos` |
 | Até quando os preços valem (datas depois aparecem como "consulte") | `tarifaValidaAte` |
+| Preços dos quartos a partir de uma data, sem fim (hoje: 01/02/2027) | `novaTarifa` |
 | Galeria em abas (Jardim, Sala de estar, Caraíva) | `galeria` |
 | Réveillon, janeiro, Carnaval… (preço por pessoa do período e mínimo de noites) | `temporadas` |
 | Datas já vendidas por fora (Booking, Airbnb, telefone) | `bloqueios` |

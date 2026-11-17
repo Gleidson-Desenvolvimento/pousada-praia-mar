@@ -41,11 +41,15 @@
     }
     return null;
   }
+  // nova tarifa dos quartos, a partir de C.novaTarifa.inicio (sem data de fim)
+  const NOVA = C.novaTarifa?.inicio ? C.novaTarifa : null;
+  const naNova = (d) => !!NOVA && key(d) >= NOVA.inicio;
   // preço POR PESSOA, por noite, com café da manhã
   const nightRate = (room, d) => {
     const s = seasonOf(d);
     if (s && s.preco) return s.preco;
-    return Math.round(room.preco * (s?.multiplicador || 1));
+    const base = (naNova(d) && NOVA.precos?.[room.id]) || room.preco;
+    return Math.round(base * (s?.multiplicador || 1));
   };
   // quantas pessoas pagam a noite: tarifa dos quartos cobra no mínimo C.minPagantes
   const pagantesNoite = (d, adultos) => {
@@ -55,7 +59,7 @@
   };
   // noites sem preço definido (depois de tarifaValidaAte e fora de temporada) → "consulte"
   const LIMITE = C.tarifaValidaAte || null;
-  const priced = (d) => !LIMITE || key(d) <= LIMITE || !!seasonOf(d);
+  const priced = (d) => !LIMITE || key(d) <= LIMITE || !!seasonOf(d) || naNova(d);
   const firstUnpriced = (ci, co) => { for (let d = new Date(ci); d < co; d = addDays(d, 1)) if (!priced(d)) return d; return null; };
   const ddmm = (d) => d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 
@@ -200,7 +204,7 @@
         <span><i style="background:var(--anil)"></i>Selecionado</span>
         ${C.temporadas.length ? `<span><i style="background:rgba(224,87,58,.25)"></i>Valor em vermelho = temporada especial</span>` : ""}
         <span><i style="background:#e9e0cf"></i>Riscado = lotado</span>
-        ${LIMITE ? `<span>“—” = valores ainda não abertos: <a href="${waLink("Olá! Gostaria de consultar valores e disponibilidade para datas que ainda não aparecem no site.")}" target="_blank" rel="noopener">consulte no WhatsApp</a></span>` : ""}
+        ${LIMITE && !NOVA ? `<span>“—” = valores ainda não abertos: <a href="${waLink("Olá! Gostaria de consultar valores e disponibilidade para datas que ainda não aparecem no site.")}" target="_blank" rel="noopener">consulte no WhatsApp</a></span>` : ""}
       </div>
       <div class="guests">
         <div class="guest-box"><div><b>Adultos</b><span>${KID_AGE + 1} anos ou mais</span></div>
