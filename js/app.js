@@ -18,7 +18,7 @@
   const datasEspeciais = (C.temporadas || []).filter((t) => t.cancelamentoDias);
   const prazoEspecial = datasEspeciais[0]?.cancelamentoDias;
   const regraEspecial = datasEspeciais.length
-    ? `${datasEspeciais.map((t) => `${t.nome} (${dataCurta(t.inicio)} a ${dataCurta(t.fim)})`).join(" e ")}: cancelamento gratuito em até ${prazoEspecial} dias após a confirmação do pagamento; depois disso, a pousada retém um percentual definido.`
+    ? `${datasEspeciais.map((t) => `${t.nome} (${dataCurta(t.inicio)} a ${dataCurta(t.fim)})`).join(", ").replace(/, (?=[^,]*$)/, " e ")}: cancelamento gratuito em até ${prazoEspecial} dias após a confirmação do pagamento; depois disso, a pousada retém um percentual definido.`
     : "";
   const regraMinimo = (C.temporadas || []).filter((t) => t.minNoites > 1).map((t) => `${t.nome}: estadia mínima de ${t.minNoites} diárias.`).join(" ");
   // tarifa dos quartos: valor mínimo (1 ou 2 pessoas) + valor por pessoa adicional
