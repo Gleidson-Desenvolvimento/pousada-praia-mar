@@ -227,6 +227,7 @@ input, select, textarea { font: inherit; color: inherit; }
 .room-card__top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-bottom: 8px; }
 .room-card h3 { font-family: var(--font-display); font-weight: 500; font-size: 23px; margin: 0; color: var(--anil-ink); }
 .price { font-family: var(--font-display); color: var(--coral); font-weight: 600; font-size: 18px; white-space: nowrap; }
+.room-card__rate { font-size: 13px; color: var(--muted); margin: -4px 0 10px; }
 .price small { font-family: var(--font-body); color: var(--muted); font-weight: 400; font-size: 12px; }
 .room-card p { font-size: 14px; color: var(--muted); margin: 0 0 16px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }

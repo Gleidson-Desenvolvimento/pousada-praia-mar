@@ -21,6 +21,10 @@
     ? `${datasEspeciais.map((t) => `${t.nome} (${dataCurta(t.inicio)} a ${dataCurta(t.fim)})`).join(" e ")}: cancelamento gratuito em até ${prazoEspecial} dias após a confirmação do pagamento; depois disso, a pousada retém um percentual definido.`
     : "";
   const regraMinimo = (C.temporadas || []).filter((t) => t.minNoites > 1).map((t) => `${t.nome}: estadia mínima de ${t.minNoites} diárias.`).join(" ");
+  // tarifa dos quartos: valor mínimo (1 ou 2 pessoas) + valor por pessoa adicional
+  const MIN_PAG = C.minPagantes || 1;
+  const precoBase = (q) => q.preco * MIN_PAG;
+  const baseTxt = MIN_PAG > 1 ? `para 1 ou ${MIN_PAG} pessoas` : "por pessoa";
   // temporadas com preço fixo ainda por vir (ex.: Réveillon, janeiro)
   const temporadasNota = () => {
     const hoje = localKey(new Date());
@@ -162,9 +166,10 @@
       <div class="room-card__body">
         <div class="room-card__top">
           <h3>${esc(q.nome)}</h3>
-          <span class="price">${brl(q.preco)}<small> por pessoa/noite</small></span>
+          <span class="price">${brl(precoBase(q))}<small> por noite</small></span>
         </div>
         <p>${esc(q.resumo)}</p>
+        ${MIN_PAG > 1 ? `<p class="room-card__rate">${brl(precoBase(q))} ${baseTxt}${q.capacidade > MIN_PAG ? ` · + ${brl(q.preco)} por pessoa adicional` : ""}</p>` : ""}
         <div class="chips">
           <span class="chip">👥 até ${q.capacidade}</span>
           ${q.camas ? `<span class="chip">🛏️ ${esc(q.camas)}</span>` : ""}
@@ -212,7 +217,8 @@
           <div class="room-modal__facts"><span class="chip">👥 até ${q.capacidade} pessoas</span>${q.camas ? `<span class="chip">🛏️ ${esc(q.camas)}</span>` : ""}${q.vista ? `<span class="chip">🌿 vista ${esc(q.vista.toLowerCase())}</span>` : ""}<span class="chip">☕ café incluso</span></div>
           <p>${esc(q.descricao)}</p>
           <ul class="amen">${q.comodidades.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
-          <p class="price" style="font-size:24px">${brl(q.preco)}<small> por pessoa/noite, com café da manhã</small></p>
+          <p class="price" style="font-size:24px">${brl(precoBase(q))}<small> por noite ${baseTxt}, com café da manhã</small></p>
+          ${MIN_PAG > 1 && q.capacidade > MIN_PAG ? `<p class="kids-note">➕ ${brl(q.preco)} por noite para cada pessoa a partir da ${MIN_PAG + 1}ª</p>` : ""}
           <p class="kids-note">👶 Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam</p>
           ${temporadasNota()}
           <button class="btn btn--coral btn--lg" data-open-booking data-room="${q.id}">Reservar ${esc(q.nome)}</button>
@@ -384,14 +390,14 @@
   /* =====================================================================
      ATENDIMENTO "MARÉ" — respostas sobre a pousada e sobre Caraíva
      ===================================================================== */
-  const precos = C.quartos.map((q) => `• ${q.nome}: ${brl(q.preco)} por pessoa/noite (até ${q.capacidade} pessoas)`).join("\n");
+  const precos = C.quartos.map((q) => `• ${q.nome}: ${brl(q.preco * (C.minPagantes || 1))} por noite ${(C.minPagantes || 1) > 1 ? `para 1 ou ${C.minPagantes} pessoas${q.capacidade > C.minPagantes ? ` + ${brl(q.preco)} por pessoa adicional` : ""}` : "por pessoa"} (até ${q.capacidade} pessoas)`).join("\n");
   const ddmm = (k) => new Date(k + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   const validade = C.tarifaValidaAte ? ddmm(C.tarifaValidaAte) : "";
   const temporadasTxt = (C.temporadas || []).filter((t) => t.preco && t.inicio.length > 5).map((t) => `• ${t.nome} (${ddmm(t.inicio)} a ${ddmm(t.fim)}): ${brl(t.preco)} por pessoa/noite`).join("\n");
   const kb = [
     { k: ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "e ai"], r: "Oi! Que bom te ver por aqui 🌊 Quer saber sobre quartos, preços, como chegar em Caraíva ou já quer reservar?" },
     { k: ["quarto", "acomoda", "suite", "suíte", "chale", "chalé", "dossel"], r: `Temos ${C.quartos.length} acomodações, todas com café da manhã incluso:\n${precos}\nQuer ver a disponibilidade para as suas datas?`, a: "booking" },
-    { k: ["preco", "preço", "valor", "quanto", "custa", "diaria", "diária", "tarifa"], r: `As diárias são cobradas por pessoa e já incluem o café da manhã. Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam:\n${precos}${validade ? `\nEsses valores valem até ${validade}.` : ""}${temporadasTxt ? `\nTemporadas (todos os quartos):\n${temporadasTxt}` : ""}\nPara outras datas, consulte a gente no WhatsApp.`, a: "booking" },
+    { k: ["preco", "preço", "valor", "quanto", "custa", "diaria", "diária", "tarifa"], r: `As diárias já incluem o café da manhã. Crianças de até ${C.criancaGratisAte ?? 10} anos não pagam:\n${precos}${validade ? `\nEsses valores valem até ${validade}.` : ""}${temporadasTxt ? `\nTemporadas (todos os quartos):\n${temporadasTxt}` : ""}\nPara outras datas, consulte a gente no WhatsApp.`, a: "booking" },
     { k: ["chegar", "chego", "aeroporto", "travessia", "canoa", "estrada", "carro", "estacion", "transfer", "porto seguro", "trancoso", "onibus", "ônibus"], r: "Caraíva fica a cerca de 70 km (≈2h30) do aeroporto de Porto Seguro, com um trecho de estrada de terra. Carros não entram na vila: você estaciona em Nova Caraíva e atravessa o rio de canoa — são poucos minutos. As malas seguem de carroça pelas ruas de areia 🛶\nA pousada fica na Aldeia Xandó, R. Pedro Marcelino, no coração de Caraíva. Oferecemos transfer do aeroporto como extra na reserva.", a: "map" },
     { k: ["endereco", "endereço", "onde fica", "localiza", "mapa", "xando", "xandó"], r: `Estamos na ${P.endereco}, no coração de Caraíva, a poucos passos da praia. Toque abaixo para abrir a rota no Google Maps 📍`, a: "map" },
     { k: ["check", "horario", "horário", "entrada", "saida", "saída"], r: `Check-in a partir das ${P.checkin} e check-out até as ${P.checkout}. Se chegar antes, guardamos suas malas e você já pode curtir a praia.` },

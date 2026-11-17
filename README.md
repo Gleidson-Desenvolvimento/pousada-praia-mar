@@ -12,7 +12,7 @@ Para publicar, envie a pasta inteira para Netlify, Vercel, GitHub Pages, Hosting
 | WhatsApp, e-mail, Instagram, endereço, horários | `pousada` |
 | **Chave Pix** (o dinheiro cai direto na sua conta) | `pix.chave` |
 | Link de pagamento com cartão (Mercado Pago, InfinitePay…) | `cartao.linkPagamento` |
-| Quartos (Baixú, Auê, Hahâu, Hayô, Maion, Angorró): fotos, camas, vista, capacidade, preço POR PESSOA | `quartos` |
+| Quartos (Baixú, Auê, Hahâu, Hayô, Maion, Angorró): fotos, camas, vista, capacidade, preço POR PESSOA (cobrado no mínimo por 2 pessoas: `minPagantes`) | `quartos` |
 | Até quando os preços valem (datas depois aparecem como "consulte") | `tarifaValidaAte` |
 | Galeria em abas (Jardim, Sala de estar, Caraíva) | `galeria` |
 | Réveillon, janeiro, Carnaval… (preço por pessoa do período e mínimo de noites) | `temporadas` |

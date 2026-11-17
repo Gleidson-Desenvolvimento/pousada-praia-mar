@@ -60,6 +60,7 @@ window.PM_CONFIG = {
 
   /* ---------------- ACOMODAÇÕES ----------------------------------------
      preco = diária POR PESSOA, com café da manhã (vale até tarifaValidaAte)
+             cobrada no mínimo por minPagantes pessoas (ver abaixo)
      unidades = quantos quartos iguais a pousada tem desse tipo           */
   quartos: [
     {
@@ -212,6 +213,12 @@ window.PM_CONFIG = {
      calendário e o hóspede é levado ao WhatsApp.                          */
   tarifaValidaAte: "2026-12-26",
 
+  /* Cobrança mínima da tarifa dos quartos: o quarto paga no mínimo por
+     esta quantidade de pessoas. Com 2: Maion = R$ 250 para 1 ou 2 pessoas
+     e + R$ 125 a partir da 3ª. Não vale para as temporadas (a não ser que
+     a temporada tenha minPagantes próprio).                              */
+  minPagantes: 2,
+
   /* Crianças com até esta idade (inclusive) NÃO pagam diária.
      Elas continuam contando na capacidade do quarto (ocupam cama).       */
   criancaGratisAte: 10,
@@ -225,7 +232,8 @@ window.PM_CONFIG = {
      preco      = diária POR PESSOA com café, igual para todos os quartos
      (ou use multiplicador: 1.5 para aplicar sobre o preço de cada quarto)
      minNoites  = estadia mínima quando a reserva pega alguma noite do período
-     cancelamentoDias = prazo de cancelamento gratuito nessas datas especiais */
+     cancelamentoDias = prazo de cancelamento gratuito nessas datas especiais
+     minPagantes = (opcional) cobrança mínima de pessoas nesse período     */
   temporadas: [
     { nome: "Réveillon", inicio: "2026-12-27", fim: "2027-01-08", preco: 1300, minNoites: 3, cancelamentoDias: 3 },
     { nome: "Janeiro", inicio: "2027-01-09", fim: "2027-01-31", preco: 500, cancelamentoDias: 3 },

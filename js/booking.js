@@ -47,6 +47,12 @@
     if (s && s.preco) return s.preco;
     return Math.round(room.preco * (s?.multiplicador || 1));
   };
+  // quantas pessoas pagam a noite: tarifa dos quartos cobra no mínimo C.minPagantes
+  const pagantesNoite = (d, adultos) => {
+    const s = seasonOf(d);
+    const min = s && s.preco ? (s.minPagantes || 1) : (C.minPagantes || 1);
+    return Math.max(adultos, min);
+  };
   // noites sem preço definido (depois de tarifaValidaAte e fora de temporada) → "consulte"
   const LIMITE = C.tarifaValidaAte || null;
   const priced = (d) => !LIMITE || key(d) <= LIMITE || !!seasonOf(d);
@@ -86,12 +92,12 @@
     const pessoas = s.adultos + s.criancas;   // ocupação do quarto
     const pagantes = s.adultos;               // crianças até KID_AGE anos não pagam
     let diarias = 0;
-    const faixas = []; // [{ preco, noites, nome }] — noites agrupadas pelo valor
+    const faixas = []; // [{ preco, noites, nome, pagantes }] — noites agrupadas pelo valor
     for (let d = new Date(s.checkin); d < s.checkout; d = addDays(d, 1)) {
-      const r = nightRate(room, d), nome = seasonOf(d)?.nome || "";
-      diarias += r * pagantes;
-      const f = faixas.find((x) => x.preco === r && x.nome === nome);
-      if (f) f.noites++; else faixas.push({ preco: r, noites: 1, nome });
+      const r = nightRate(room, d), nome = seasonOf(d)?.nome || "", p = pagantesNoite(d, pagantes);
+      diarias += r * p;
+      const f = faixas.find((x) => x.preco === r && x.nome === nome && x.pagantes === p);
+      if (f) f.noites++; else faixas.push({ preco: r, noites: 1, nome, pagantes: p });
     }
     const extraPessoas = 0;
     const extras = C.extras.filter((e) => s.extras.has(e.id)).map((e) => ({ ...e, total: e.tipo === "pessoa" ? e.preco * pessoas : e.preco }));
@@ -228,7 +234,9 @@
   const rateLabel = (qq) => {
     const v = qq.faixas.map((f) => f.preco);
     const lo = Math.min(...v), hi = Math.max(...v);
-    return lo === hi ? brl(lo) : `${brl(lo)} a ${brl(hi)}`;
+    const txt = lo === hi ? brl(lo) : `${brl(lo)} a ${brl(hi)}`;
+    const min = qq.faixas.find((f) => f.pagantes > qq.pagantes);
+    return `${txt} por pessoa/noite${min ? `<br/>valor mínimo de ${min.pagantes} pessoas` : ""}`;
   };
   function stepRoom() {
     const n = nightsBetween(state.checkin, state.checkout);
@@ -243,7 +251,7 @@
         <button type="button" class="pick-room ${state.quartoId === q.id ? "on" : ""}" data-room="${q.id}" ${ok ? "" : "disabled"}>
           <img src="${q.img}" alt="${esc(q.nome)}" />
           <div><h4>${esc(q.nome)}</h4><p>${esc(q.resumo)}</p>${badge}</div>
-          <div class="pick-room__price"><b>${brl(qq.diarias)}</b><span>${n} noite${n > 1 ? "s" : ""} · ${state.adultos} adulto${state.adultos > 1 ? "s" : ""}${state.criancas ? ` + ${state.criancas} criança${state.criancas > 1 ? "s" : ""} grátis` : ""}<br/>${rateLabel(qq)} por pessoa/noite</span></div>
+          <div class="pick-room__price"><b>${brl(qq.diarias)}</b><span>${n} noite${n > 1 ? "s" : ""} · ${state.adultos} adulto${state.adultos > 1 ? "s" : ""}${state.criancas ? ` + ${state.criancas} criança${state.criancas > 1 ? "s" : ""} grátis` : ""}<br/>${rateLabel(qq)}</span></div>
         </button>`;
     }).join("");
     const none = C.quartos.every((q) => !(q.capacidade >= pessoas && rangeFree(q.id, state.checkin, state.checkout)));
@@ -544,7 +552,7 @@
       return;
     }
     const lines = [
-      ...q.faixas.map((f) => `<li><span>${f.noites} diária${f.noites > 1 ? "s" : ""}${f.nome ? ` ${esc(f.nome)}` : ""} × ${q.pagantes} adulto${q.pagantes > 1 ? "s" : ""} (${brl(f.preco)})</span><span>${brl(f.preco * f.noites * q.pagantes)}</span></li>`),
+      ...q.faixas.map((f) => `<li><span>${f.noites} diária${f.noites > 1 ? "s" : ""}${f.nome ? ` ${esc(f.nome)}` : ""} × ${f.pagantes > q.pagantes ? `mínimo de ${f.pagantes} pessoas` : `${f.pagantes} adulto${f.pagantes > 1 ? "s" : ""}`} (${brl(f.preco)})</span><span>${brl(f.preco * f.noites * f.pagantes)}</span></li>`),
       q.criancas ? `<li class="disc"><span>${q.criancas} criança${q.criancas > 1 ? "s" : ""} até ${KID_AGE} anos</span><span>grátis</span></li>` : "",
       q.extraPessoas ? `<li><span>Hóspedes adicionais</span><span>${brl(q.extraPessoas)}</span></li>` : "",
       ...q.extras.map((e) => `<li><span>${esc(e.nome)}</span><span>${brl(e.total)}</span></li>`),
