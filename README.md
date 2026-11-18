@@ -30,8 +30,10 @@ As políticas da reserva ficam em `js/app.js` (procure por “políticas”). As
 1. **Datas**: calendário com preço por dia, temporadas e mínimo de noites.
 2. **Quarto**: mostra só o que cabe no grupo e está livre nas datas.
 3. **Dados**: validação de nome, e-mail, WhatsApp e CPF + extras opcionais.
-4. **Pagamento**: Pix com QR Code e copia-e-cola reais (sinal de 50% ou integral com 5% off),
-   ou cartão via link de pagamento.
+4. **Pagamento**: com `mercadoPago.funcaoUrl` preenchido, o hóspede escolhe sinal de 50% ou valor
+   integral e paga no **Mercado Pago** (Pix, cartão de crédito e de débito, saldo). A confirmação é
+   automática: o pedido aparece como pago no painel. Sem ele, Pix com QR Code (sinal ou integral)
+   ou cartão via link de pagamento. Não há desconto em nenhuma forma de pagamento.
 5. **Confirmação**: código da reserva, envio de tudo pelo WhatsApp da pousada,
    arquivo de calendário (.ics) e impressão/PDF.
 

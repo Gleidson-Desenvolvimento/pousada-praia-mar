@@ -30,7 +30,6 @@ window.PM_CONFIG = {
     chave: "praiamarpousadacaraiva@hotmail.com", // TODO: confirme a sua chave Pix real
     nomeRecebedor: "POUSADA PRAIA MAR",
     cidadeRecebedor: "PORTO SEGURO",
-    descontoPagamentoTotal: 0.05, // 5% off pagando 100% no Pix
   },
 
   /* ---------------- CARTÃO ---------------------------------------------
@@ -41,6 +40,19 @@ window.PM_CONFIG = {
   cartao: {
     linkPagamento: "",  // ex.: "https://mpago.la/xxxxxxx"
     parcelasMax: 6,
+  },
+
+  /* ---------------- MERCADO PAGO (pagamento automático) ------------------
+     funcaoUrl = endereço da função "criarPagamento" no Firebase. Com ele
+     preenchido, o hóspede paga no Mercado Pago (Pix, cartão de crédito e
+     de débito, saldo Mercado Pago) e a reserva é confirmada sozinha.
+     Vazio = o site usa o Pix direto e o link de cartão acima.
+     parcelasSemJuros só aparece no texto: os juros são configurados na
+     conta do Mercado Pago.                                               */
+  mercadoPago: {
+    funcaoUrl: "",
+    parcelasMax: 12,
+    parcelasSemJuros: 6,
   },
 
   /* Percentual cobrado como sinal para garantir a reserva */

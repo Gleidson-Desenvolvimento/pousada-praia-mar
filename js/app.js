@@ -249,7 +249,9 @@
   const pct = Math.round(C.sinal * 100);
   $("#policyBody").innerHTML = `
     <h4>Garantia da reserva</h4>
-    <p>A reserva é confirmada com o pagamento de ${pct}% do valor total (sinal) via Pix ou cartão. O restante é pago no check-in. Pagando 100% no Pix, você ganha ${Math.round(C.pix.descontoPagamentoTotal * 100)}% de desconto.</p>
+    <p>${C.mercadoPago?.funcaoUrl
+      ? `A reserva é confirmada com o pagamento de ${pct}% do valor total (sinal) ou do valor integral, pelo Mercado Pago: Pix, cartão de crédito em até ${C.mercadoPago.parcelasMax || 12}x${C.mercadoPago.parcelasSemJuros ? ` (até ${C.mercadoPago.parcelasSemJuros}x sem juros)` : ""}, cartão de débito ou saldo do Mercado Pago. Pagando o sinal, o restante é pago no check-in.`
+      : `A reserva é confirmada com o pagamento de ${pct}% do valor total (sinal) ou do valor integral, via Pix ou cartão. Pagando o sinal, o restante é pago no check-in.`}</p>
     <h4>Cancelamento</h4>
     <p>${regraCancel}</p>
     ${regraEspecial ? `<h4>Datas especiais</h4>
@@ -413,7 +415,9 @@
     { k: ["check", "horario", "horário", "entrada", "saida", "saída"], r: `Check-in a partir das ${P.checkin} e check-out até as ${P.checkout}. Se chegar antes, guardamos suas malas e você já pode curtir a praia.` },
     { k: ["cafe", "café", "manha", "manhã", "refei", "comida", "tapioca"], r: "O café da manhã está incluso e é bem baiano: tapioca, cuscuz, frutas da estação, bolos caseiros, pães, ovos e café passado na hora ☕" },
     { k: ["cancel", "reembolso", "desist", "politica", "política"], r: "As regras de cancelamento estão nas políticas da reserva. Toque abaixo para ler.", a: "policy" },
-    { k: ["pix", "pagamento", "pagar", "cartao", "cartão", "parcel", "sinal"], r: `Você garante a reserva com ${Math.round(C.sinal * 100)}% de sinal via Pix (QR Code na hora) ou cartão em até ${C.cartao.parcelasMax}x. Pagando 100% no Pix, ganha ${Math.round(C.pix.descontoPagamentoTotal * 100)}% de desconto. O restante é pago no check-in.` },
+    { k: ["pix", "pagamento", "pagar", "cartao", "cartão", "parcel", "sinal"], r: C.mercadoPago?.funcaoUrl
+      ? `Você garante a reserva pagando ${Math.round(C.sinal * 100)}% de sinal (o restante no check-in) ou o valor integral, pelo Mercado Pago: Pix, cartão de crédito em até ${C.mercadoPago.parcelasMax || 12}x${C.mercadoPago.parcelasSemJuros ? ` (até ${C.mercadoPago.parcelasSemJuros}x sem juros)` : ""}, cartão de débito ou saldo do Mercado Pago. A confirmação é automática.`
+      : `Você garante a reserva com ${Math.round(C.sinal * 100)}% de sinal via Pix (QR Code na hora) ou cartão em até ${C.cartao.parcelasMax}x, ou pagando o valor integral. O restante é pago no check-in.` },
     { k: ["dinheiro", "saque", "caixa eletr", "banco", "especie", "espécie"], r: "Na vila as opções de saque são poucas, então vale levar algum dinheiro em espécie — principalmente para a travessia de canoa e os barqueiros. Na maioria dos lugares dá para pagar com Pix e cartão." },
     { k: ["pet", "cachorro", "gato", "animal"], r: "Sobre pets, cada caso a gente conversa direitinho. Me chama no WhatsApp que te respondo rapidinho 🐾", a: "wa" },
     { k: ["fazer", "passeio", "roteiro", "atividade", "corumbau", "satu", "espelho", "boia", "pataxo", "pataxó", "aldeia"], r: "Os clássicos de Caraíva:\n• Descer o rio de boia até a Praia da Barra\n• Pôr do sol de canoa no rio\n• Caminhar 4 km até a Praia do Satu\n• Barco até a Ponta do Corumbau e suas piscinas naturais\n• Vivências com guias Pataxó na região\n• Forró na areia à noite\nA gente ajuda a organizar tudo!" },

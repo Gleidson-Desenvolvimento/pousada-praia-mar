@@ -1,11 +1,13 @@
 /* =====================================================================
    POUSADA PRAIA MAR — Fluxo de reserva
-   1 Datas → 2 Quarto → 3 Dados → 4 Pagamento (Pix/Cartão) → 5 Confirmação
+   1 Datas → 2 Quarto → 3 Dados → 4 Pagamento (Mercado Pago, ou Pix/Cartão) → 5 Confirmação
    ===================================================================== */
 (function () {
   "use strict";
   const C = window.PM_CONFIG;
   const STORE_KEY = "pm_reservas";
+  const MP = C.mercadoPago?.funcaoUrl ? C.mercadoPago : null; // pagamento pelo Mercado Pago
+  const MP_KEY = "pm_mp_pendente"; // reserva que foi para o checkout do Mercado Pago
   const MAX_NIGHTS = 30;
   const KID_AGE = C.criancaGratisAte ?? 10; // crianças até essa idade não pagam
   const MAX_GUESTS = Math.max(...C.quartos.map((q) => q.capacidade));
@@ -107,9 +109,10 @@
     const extras = C.extras.filter((e) => s.extras.has(e.id)).map((e) => ({ ...e, total: e.tipo === "pessoa" ? e.preco * pessoas : e.preco }));
     const extrasTotal = extras.reduce((a, e) => a + e.total, 0);
     const subtotal = diarias + extraPessoas + extrasTotal;
-    const desconto = s.pagamento === "pix-total" ? Math.round(subtotal * C.pix.descontoPagamentoTotal * 100) / 100 : 0;
-    const total = subtotal - desconto;
-    const agora = s.pagamento === "pix-total" ? total : Math.round(total * C.sinal * 100) / 100;
+    const desconto = 0; // sem desconto em nenhuma forma de pagamento
+    const total = subtotal;
+    const integral = s.pagamento === "pix-total" || s.pagamento === "mp-integral";
+    const agora = integral ? total : Math.round(total * C.sinal * 100) / 100;
     return { room, n, pessoas, pagantes, criancas: s.criancas, diarias, faixas, extraPessoas, extras, subtotal, desconto, total, agora, restante: total - agora };
   }
 
@@ -135,8 +138,8 @@
   /* ---------------- estado ---------------- */
   const fresh = () => ({
     step: 1, checkin: null, checkout: null, adultos: 2, criancas: 0, quartoId: null,
-    extras: new Set(), hospede: {}, pagamento: "pix-sinal", codigo: null, calMonth: (() => { const t = today(); return new Date(t.getFullYear(), t.getMonth(), 1); })(),
-    pixExpira: null, reserva: null,
+    extras: new Set(), hospede: {}, pagamento: MP ? "mp-sinal" : "pix-sinal", codigo: null, calMonth: (() => { const t = today(); return new Date(t.getFullYear(), t.getMonth(), 1); })(),
+    pixExpira: null, reserva: null, mpSituacao: null, mpCorpo: null,
   });
   let state = fresh();
   let timerId = null;
@@ -358,12 +361,43 @@
   }
 
   /* ---------- PASSO 4: pagamento ---------- */
+  const payOpt = (id, title, sub, val) => `<button type="button" class="pay-opt ${state.pagamento === id ? "on" : ""}" data-pay="${id}"><b>${title}</b><span>${sub}</span><strong>${val}</strong></button>`;
+  function stepPayMP() {
+    const base = quote({ ...state, pagamento: "mp-sinal" });
+    const full = quote({ ...state, pagamento: "mp-integral" });
+    if (!state.codigo) state.codigo = genCode();
+    const q = quote();
+    const pct = Math.round(C.sinal * 100);
+    return `
+      <p class="bk-title">Como prefere pagar?</p>
+      <p class="bk-sub">Reserva nº <b>${state.codigo}</b> · total ${brl(q.total)}</p>
+      <div class="pay-opts pay-opts--2">
+        ${payOpt("mp-sinal", `Sinal de ${pct}%`, `Restante (${brl(base.restante)}) no check-in`, brl(base.agora))}
+        ${payOpt("mp-integral", "Valor integral", "Pague tudo agora", brl(full.total))}
+      </div>
+      <div class="card-box mp-box">
+        <p>🔒 Você vai para o ambiente seguro do <b>Mercado Pago</b> para pagar <b>${brl(q.agora)}</b>. Lá você escolhe a forma de pagamento:</p>
+        <ul class="mp-formas">
+          <li>Pix, com aprovação na hora</li>
+          <li>Cartão de crédito em até ${MP.parcelasMax || 12}x${MP.parcelasSemJuros ? `, até ${MP.parcelasSemJuros}x sem juros` : ""}</li>
+          <li>Cartão de débito</li>
+          <li>Saldo do Mercado Pago</li>
+        </ul>
+        <p style="margin:0">Assim que o pagamento é aprovado, sua reserva fica confirmada. O site da pousada não vê nem guarda os dados do seu cartão.</p>
+      </div>
+      <p class="bk-error" id="bkErr"></p>
+      <div class="bk-nav">
+        <button type="button" class="btn btn--line" data-back>← Dados</button>
+        <button type="button" class="btn btn--coral btn--lg" data-finish>Ir para o pagamento →</button>
+      </div>`;
+  }
   function stepPay() {
+    if (MP) return stepPayMP();
     const base = quote({ ...state, pagamento: "pix-sinal" });
     const full = quote({ ...state, pagamento: "pix-total" });
     if (!state.codigo) state.codigo = genCode();
     const q = quote();
-    const opt = (id, title, sub, val) => `<button type="button" class="pay-opt ${state.pagamento === id ? "on" : ""}" data-pay="${id}"><b>${title}</b><span>${sub}</span><strong>${val}</strong></button>`;
+    const opt = payOpt;
     let detail = "";
     if (state.pagamento.startsWith("pix")) {
       if (!state.pixExpira) state.pixExpira = Date.now() + 30 * 60 * 1000;
@@ -404,7 +438,7 @@
       <p class="bk-sub">Reserva nº <b>${state.codigo}</b> · total ${brl(q.total)}</p>
       <div class="pay-opts">
         ${opt("pix-sinal", `Pix · sinal de ${Math.round(C.sinal * 100)}%`, "Restante no check-in", brl(base.agora))}
-        ${opt("pix-total", "Pix · valor integral", `${Math.round(C.pix.descontoPagamentoTotal * 100)}% de desconto`, brl(full.total))}
+        ${opt("pix-total", "Pix · valor integral", "Pague tudo agora", brl(full.total))}
         ${opt("cartao", "Cartão de crédito", `Até ${C.cartao.parcelasMax}x · sinal de ${Math.round(C.sinal * 100)}%`, brl(base.agora))}
       </div>
       ${detail}
@@ -455,6 +489,7 @@
       desconto: q.desconto,
       hospede: { nome: h.nome, email: h.email, telefone: h.telefone, cpf: h.cpf, cidade: h.cidade, chegada: h.chegada, ocasiao: h.ocasiao, obs: h.obs },
     };
+    if (MP) return pagarMP(r);
     const list = loadStored();
     list.push(r);
     try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch {}
@@ -467,11 +502,109 @@
     go(5);
   }
 
+  /* ---------- Mercado Pago: abre o checkout ---------- */
+  async function abrirCheckout(r, corpo) {
+    const btn = $("[data-finish], [data-mp-retry]"), err = $("#bkErr");
+    const rotulo = btn?.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = "Abrindo o Mercado Pago…"; }
+    if (err) err.textContent = "";
+    try {
+      const res = await fetch(MP.funcaoUrl, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo), signal: AbortSignal.timeout(25000),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || !j.url) throw new Error(j.erro || "Não foi possível abrir o pagamento agora. Tente de novo em instantes.");
+      Object.assign(r, { total: j.total, pagoAgora: j.agora, restante: j.restante });
+      try { localStorage.setItem(MP_KEY, JSON.stringify({ r, corpo })); } catch {}
+      location.href = j.url;
+    } catch (e) {
+      if (btn) { btn.disabled = false; btn.textContent = rotulo; }
+      const msg = e.name === "TimeoutError" ? "O pagamento demorou para responder. Tente de novo." : e.message;
+      if (err) err.innerHTML = `${esc(msg)} <a href="${waLink(`Olá! Tentei pagar a reserva ${r.codigo} pelo site e não consegui.`)}" target="_blank" rel="noopener">Falar com a pousada no WhatsApp</a>`;
+    }
+  }
+  function pagarMP(r) {
+    const corpo = {
+      codigo: r.codigo, quarto: r.quarto, inicio: r.inicio, fim: r.fim, adultos: r.adultos, criancas: r.criancas,
+      extras: [...state.extras], modo: r.pagamento === "mp-integral" ? "integral" : "sinal", hospede: r.hospede,
+      retorno: location.origin + location.pathname,
+    };
+    state.reserva = r; state.mpCorpo = corpo;
+    return abrirCheckout(r, corpo);
+  }
+
+  /* Volta do Mercado Pago: ?retorno=mp&reserva=PM...&situacao=aprovado|pendente|falhou
+     (o Mercado Pago ainda junta collection_status, payment_id...) */
+  function retornoMP() {
+    const u = new URLSearchParams(location.search);
+    if (u.get("retorno") !== "mp") return;
+    const codigo = u.get("reserva") || u.get("external_reference") || "";
+    const st = u.get("collection_status") || u.get("status") || "";
+    const sit = st === "approved" ? "aprovado"
+      : ["rejected", "cancelled", "null"].includes(st) || u.get("situacao") === "falhou" ? "falhou"
+      : u.get("situacao") === "aprovado" && !st ? "aprovado" : "pendente";
+    history.replaceState(null, "", location.pathname + location.hash);
+    let salvo = null;
+    try { salvo = JSON.parse(localStorage.getItem(MP_KEY)); } catch {}
+    if (salvo?.r?.codigo !== codigo) salvo = null;
+    const r = salvo ? salvo.r : { codigo, hospede: { nome: "" }, extras: [], pagamento: "mp-sinal" };
+    if (sit === "aprovado" && salvo) {
+      r.status = "pago";
+      const list = loadStored().filter((x) => x.codigo !== r.codigo);
+      list.push(r);
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); localStorage.removeItem(MP_KEY); } catch {}
+      if (C.webhookUrl) fetch(C.webhookUrl, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(r) }).catch(() => {});
+    }
+    state = fresh();
+    Object.assign(state, { reserva: r, mpSituacao: sit, mpCorpo: salvo?.corpo || null });
+    lastFocus = document.activeElement;
+    modal().hidden = false;
+    document.body.classList.add("lock");
+    go(5);
+  }
+
+  function stepDoneMP() {
+    const r = state.reserva, s = state.mpSituacao;
+    const first = esc((r.hospede?.nome || "").split(" ")[0]);
+    const icone = {
+      aprovado: `<path d="M5 12l5 5 9-10"/>`,
+      pendente: `<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>`,
+      falhou: `<path d="M7 7l10 10M17 7L7 17"/>`,
+    }[s];
+    const titulo = { aprovado: "Reserva confirmada!", pendente: "Pagamento em processamento", falhou: "Pagamento não concluído" }[s];
+    const status = { aprovado: "Pagamento aprovado", pendente: "Aguardando a confirmação do Mercado Pago", falhou: "O pagamento não foi aprovado" }[s];
+    const texto = {
+      aprovado: `Recebemos o seu pagamento${r.pagoAgora ? ` de ${brl(r.pagoAgora)}` : ""}.${r.restante > 0 ? ` O restante, ${brl(r.restante)}, é pago no check-in.` : ""} Guarde o código da reserva. Antes da chegada mandamos as dicas da travessia de canoa. 🛶`,
+      pendente: "Assim que o Mercado Pago aprovar o pagamento, sua reserva fica confirmada. Se escolheu Pix, conclua o pagamento no app do seu banco dentro do prazo.",
+      falhou: "Nenhum valor foi cobrado. Você pode tentar de novo, com outro cartão ou com Pix.",
+    }[s];
+    return `
+      <div class="done print-area">
+        <div class="done__icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#151a45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${icone}</svg></div>
+        <p class="hand">${s === "aprovado" ? `até breve${first ? `, ${first}` : ""}!` : "falta pouco"}</p>
+        <p class="bk-title">${titulo}</p>
+        <span class="done__status done__status--${s}">● ${status}</span>
+        <div><span class="done__code">${esc(r.codigo)}</span></div>
+        ${r.quartoNome ? `<p class="muted">${esc(r.quartoNome)} · ${fmtShort(parse(r.inicio))} → ${fmtShort(parse(r.fim))} · ${r.noites} noites<br/>Total ${brl(r.total)}${r.restante > 0 ? ` · ${brl(r.pagoAgora)} agora e ${brl(r.restante)} no check-in` : ""}</p>` : ""}
+        <p class="muted" style="font-size:14px">${texto}</p>
+        <p class="bk-error" id="bkErr"></p>
+        <div class="done__actions">
+          ${s === "falhou" && state.mpCorpo ? `<button type="button" class="btn btn--coral btn--lg btn--block" data-mp-retry>Tentar pagar de novo</button>` : ""}
+          ${s === "aprovado" && r.inicio ? `<button type="button" class="btn btn--line btn--block" data-ics>📅 Adicionar ao calendário</button>
+          <button type="button" class="btn btn--line btn--block" data-print>🖨️ Imprimir / salvar em PDF</button>` : ""}
+          <a class="btn btn--line btn--block" href="${waLink(r.quartoNome ? reservationText(r) : `Olá! Fiz a reserva ${r.codigo} pelo site.`)}" target="_blank" rel="noopener">Falar com a pousada no WhatsApp</a>
+          <button type="button" class="btn btn--line btn--block" data-close-done>Voltar ao site</button>
+        </div>
+      </div>`;
+  }
+
   /* ---------- PASSO 5: confirmação ---------- */
   function reservationText(r) {
-    const pag = { "pix-sinal": `Pix (sinal) — ${brl(r.pagoAgora)}`, "pix-total": `Pix (integral) — ${brl(r.pagoAgora)}`, cartao: `Cartão — sinal ${brl(r.pagoAgora)} (aguardando link)` }[r.pagamento];
+    const pag = { "pix-sinal": `Pix (sinal) — ${brl(r.pagoAgora)}`, "pix-total": `Pix (integral) — ${brl(r.pagoAgora)}`, cartao: `Cartão — sinal ${brl(r.pagoAgora)} (aguardando link)`,
+      "mp-sinal": `Mercado Pago (sinal) — ${brl(r.pagoAgora)}`, "mp-integral": `Mercado Pago (integral) — ${brl(r.pagoAgora)}` }[r.pagamento];
+    const mp = r.pagamento.startsWith("mp-");
     return [
-      `Olá! Acabei de fazer uma reserva pelo site da ${C.pousada.nome} 🌊`,
+      mp ? `Olá! Fiz uma reserva pelo site da ${C.pousada.nome} 🌊` : `Olá! Acabei de fazer uma reserva pelo site da ${C.pousada.nome} 🌊`,
       ``,
       `*Reserva:* ${r.codigo}`,
       `*Quarto:* ${r.quartoNome}`,
@@ -488,12 +621,13 @@
       r.hospede.ocasiao && r.hospede.ocasiao !== "Nenhuma" ? `*Ocasião:* ${r.hospede.ocasiao}` : null,
       r.hospede.obs ? `*Obs.:* ${r.hospede.obs}` : null,
       ``,
-      r.pagamento.startsWith("pix") ? `Segue o comprovante do Pix 👇` : `Aguardo o link de pagamento 🙂`,
+      mp ? null : r.pagamento.startsWith("pix") ? `Segue o comprovante do Pix 👇` : `Aguardo o link de pagamento 🙂`,
     ].filter((l) => l !== null).join("\n");
   }
   const waLink = (text) => `https://wa.me/${C.pousada.whatsapp}?text=${encodeURIComponent(text)}`;
 
   function stepDone() {
+    if (state.mpSituacao) return stepDoneMP();
     const r = state.reserva;
     const first = esc(r.hospede.nome.split(" ")[0]);
     return `
@@ -658,6 +792,7 @@
         if (e.target.closest("[data-finish]")) finish();
     } },
     5: { click(e) {
+        if (e.target.closest("[data-mp-retry]") && state.mpCorpo) return abrirCheckout(state.reserva, state.mpCorpo);
         if (e.target.closest("[data-ics]")) downloadICS(state.reserva);
         if (e.target.closest("[data-print]")) window.print();
         if (e.target.closest("[data-close-done]")) close(true);
@@ -699,6 +834,7 @@
       if (e.target.closest("[data-close]")) close();
       if (e.target.closest("[data-sumtoggle]")) { $("#bkSummary").classList.toggle("collapsed"); renderSummary(); }
     });
+    retornoMP(); // hóspede voltando do Mercado Pago
   });
 
   window.PMBooking = { open, close, isOpen: () => !modal().hidden, validateRange: (ci, co) => {
