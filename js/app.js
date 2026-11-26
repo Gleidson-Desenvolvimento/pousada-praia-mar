@@ -14,11 +14,12 @@
   const dataCurta = (k) => new Date(k + "T12:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   // regras de cancelamento e datas especiais: aparecem só nas políticas da reserva
   const prazoCancel = C.cancelamentoDias ?? 7;
-  const regraCancel = `Devolução integral em até ${prazoCancel} dias após a confirmação do pagamento; depois disso, a pousada retém um percentual definido.`;
+  const retencao = Math.round((C.cancelamentoRetencao ?? 0.5) * 100);
+  const regraCancel = `Devolução integral em até ${prazoCancel} dias após a confirmação do pagamento; depois disso, a pousada retém ${retencao}% do valor pago.`;
   const datasEspeciais = (C.temporadas || []).filter((t) => t.cancelamentoDias);
   const prazoEspecial = datasEspeciais[0]?.cancelamentoDias;
   const regraEspecial = datasEspeciais.length
-    ? `${datasEspeciais.map((t) => `${t.nome} (${dataCurta(t.inicio)} a ${dataCurta(t.fim)})`).join(", ").replace(/, (?=[^,]*$)/, " e ")}: cancelamento gratuito em até ${prazoEspecial} dias após a confirmação do pagamento; depois disso, a pousada retém um percentual definido.`
+    ? `${datasEspeciais.map((t) => `${t.nome} (${dataCurta(t.inicio)} a ${dataCurta(t.fim)})`).join(", ").replace(/, (?=[^,]*$)/, " e ")}: cancelamento gratuito em até ${prazoEspecial} dias após a confirmação do pagamento; depois disso, a pousada retém ${retencao}% do valor pago.`
     : "";
   const regraMinimo = (C.temporadas || []).filter((t) => t.minNoites > 1).map((t) => `${t.nome}: estadia mínima de ${t.minNoites} diárias.`).join(" ");
   // tarifa dos quartos: valor mínimo (1 ou 2 pessoas) + valor por pessoa adicional

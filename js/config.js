@@ -248,6 +248,9 @@ window.PM_CONFIG = {
   /* Prazo para cancelar com devolução integral, contado da confirmação do
      pagamento. Datas especiais usam cancelamentoDias da temporada.        */
   cancelamentoDias: 7,
+  /* Depois desse prazo, a pousada retém esta parte do valor pago (0.5 = 50%).
+     O painel usa o mesmo número para sugerir a devolução ao cancelar.     */
+  cancelamentoRetencao: 0.5,
 
   /* TEMPORADAS — períodos com preço próprio.
      inicio / fim = primeira e ÚLTIMA NOITE do período ("AAAA-MM-DD").
