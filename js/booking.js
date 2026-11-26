@@ -514,6 +514,14 @@
       });
       const j = await res.json().catch(() => ({}));
       if (!res.ok || !j.url) throw new Error(j.erro || "Não foi possível abrir o pagamento agora. Tente de novo em instantes.");
+      // O servidor sempre recalcula o valor. Se mudou desde que a página abriu (preço
+      // atualizado nesse meio-tempo), mostra o valor novo e pede para confirmar antes de cobrar.
+      if (Math.abs(j.agora - r.pagoAgora) > 0.009 && state.mpValorConfirmado !== j.agora) {
+        state.mpValorConfirmado = j.agora; // o próximo clique com este mesmo valor segue para o pagamento
+        if (btn) { btn.disabled = false; btn.textContent = "Confirmar e ir para o pagamento →"; }
+        if (err) err.innerHTML = `O valor desta reserva foi atualizado: total <b>${brl(j.total)}</b>, a pagar agora <b>${brl(j.agora)}</b>. Confira e toque no botão para continuar.`;
+        return;
+      }
       Object.assign(r, { total: j.total, pagoAgora: j.agora, restante: j.restante });
       try { localStorage.setItem(MP_KEY, JSON.stringify({ r, corpo })); } catch {}
       location.href = j.url;
