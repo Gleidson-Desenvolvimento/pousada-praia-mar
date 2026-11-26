@@ -77,7 +77,7 @@ window.PM_CONFIG = {
   quartos: [
     {
       id: "baixu",
-      nome: "Suíte Baixú",
+      nome: "Suíte 03 · Baixú",
       resumo: "Suíte clara e fresca com cama queen, cama de solteiro e vista para o jardim.",
       descricao:
         "Clara, fresca e cheia de luz natural. A Baixú tem cama queen com mosquiteiro, uma cama de solteiro, janelas de madeira abertas para o jardim e banheiro em tons de azul.",
@@ -93,7 +93,7 @@ window.PM_CONFIG = {
     },
     {
       id: "aue",
-      nome: "Suíte Auê",
+      nome: "Suíte 04 · Auê",
       resumo: "A maior suíte da casa: cama king, 3 camas de solteiro e vista para o jardim.",
       descricao:
         "Espaçosa e cheia de cor, com paredes pintadas à mão nos tons do pôr do sol. Cama king com dossel, três camas de solteiro e vista para o jardim — perfeita para famílias e grupos de amigos.",
@@ -109,7 +109,7 @@ window.PM_CONFIG = {
     },
     {
       id: "hahau",
-      nome: "Suíte Hahâu",
+      nome: "Suíte 06 · Hahâu",
       resumo: "Suíte para casal com cama queen com dossel e vista para a varanda.",
       descricao:
         "A suíte mais romântica da Praia Mar. Cama queen com dossel de voil, grafismos em tons de areia nas paredes e janela para a varanda com espreguiçadeiras.",
@@ -125,7 +125,7 @@ window.PM_CONFIG = {
     },
     {
       id: "hayo",
-      nome: "Suíte Hayô",
+      nome: "Suíte 05 · Hayô",
       resumo: "Cama queen, 3 camas de solteiro e vista para a varanda.",
       descricao:
         "Barrado verde-mar, luminárias de palha e espelho com moldura colorida. Cama queen com dossel, três camas de solteiro e vista para a varanda — espaço de sobra para a família toda.",
@@ -141,7 +141,7 @@ window.PM_CONFIG = {
     },
     {
       id: "maion",
-      nome: "Quarto Maion",
+      nome: "Quarto 01 · Maion",
       resumo: "Quarto aconchegante com cama de casal e cama de solteiro.",
       descricao:
         "Simples e aconchegante, com cama de casal, cama de solteiro, sofá listrado para descansar e janela de madeira deixando a brisa entrar.",
@@ -157,7 +157,7 @@ window.PM_CONFIG = {
     },
     {
       id: "angoro",
-      nome: "Suíte Angorró",
+      nome: "Suíte 02 · Angorró",
       resumo: "Cama king com dossel e 2 camas de solteiro.",
       descricao:
         "Luz suave, pratos de palha trançada na parede e cama king com dossel, além de duas camas de solteiro. Ótima para casal com filhos ou amigos viajando juntos.",
