@@ -250,7 +250,7 @@
   $("#policyBody").innerHTML = `
     <h4>Garantia da reserva</h4>
     <p>${C.mercadoPago?.funcaoUrl
-      ? `A reserva é confirmada com o pagamento de ${pct}% do valor total (sinal) ou do valor integral, pelo Mercado Pago: Pix, cartão de crédito em até ${C.mercadoPago.parcelasMax || 12}x${C.mercadoPago.parcelasSemJuros ? ` (até ${C.mercadoPago.parcelasSemJuros}x sem juros)` : ""}, cartão de débito ou saldo do Mercado Pago. Pagando o sinal, o restante é pago no check-in.`
+      ? `A reserva é confirmada com o pagamento de ${pct}% do valor total (sinal) ou do valor integral, pelo Mercado Pago: Pix, cartão de crédito em até ${C.mercadoPago.parcelasMax || 12}x${C.mercadoPago.parcelasSemJuros ? ` (até ${C.mercadoPago.parcelasSemJuros}x sem juros)` : " (parcelado com juros)"}, cartão de débito ou saldo do Mercado Pago. Pagando o sinal, o restante é pago no check-in.`
       : `A reserva é confirmada com o pagamento de ${pct}% do valor total (sinal) ou do valor integral, via Pix ou cartão. Pagando o sinal, o restante é pago no check-in.`}</p>
     <h4>Cancelamento</h4>
     <p>${regraCancel}</p>
@@ -416,7 +416,7 @@
     { k: ["cafe", "café", "manha", "manhã", "refei", "comida", "tapioca"], r: "O café da manhã está incluso e é bem baiano: tapioca, cuscuz, frutas da estação, bolos caseiros, pães, ovos e café passado na hora ☕" },
     { k: ["cancel", "reembolso", "desist", "politica", "política"], r: "As regras de cancelamento estão nas políticas da reserva. Toque abaixo para ler.", a: "policy" },
     { k: ["pix", "pagamento", "pagar", "cartao", "cartão", "parcel", "sinal"], r: C.mercadoPago?.funcaoUrl
-      ? `Você garante a reserva pagando ${Math.round(C.sinal * 100)}% de sinal (o restante no check-in) ou o valor integral, pelo Mercado Pago: Pix, cartão de crédito em até ${C.mercadoPago.parcelasMax || 12}x${C.mercadoPago.parcelasSemJuros ? ` (até ${C.mercadoPago.parcelasSemJuros}x sem juros)` : ""}, cartão de débito ou saldo do Mercado Pago. A confirmação é automática.`
+      ? `Você garante a reserva pagando ${Math.round(C.sinal * 100)}% de sinal (o restante no check-in) ou o valor integral, pelo Mercado Pago: Pix, cartão de crédito em até ${C.mercadoPago.parcelasMax || 12}x${C.mercadoPago.parcelasSemJuros ? ` (até ${C.mercadoPago.parcelasSemJuros}x sem juros)` : " (parcelado com juros)"}, cartão de débito ou saldo do Mercado Pago. A confirmação é automática.`
       : `Você garante a reserva com ${Math.round(C.sinal * 100)}% de sinal via Pix (QR Code na hora) ou cartão em até ${C.cartao.parcelasMax}x, ou pagando o valor integral. O restante é pago no check-in.` },
     { k: ["dinheiro", "saque", "caixa eletr", "banco", "especie", "espécie"], r: "Na vila as opções de saque são poucas, então vale levar algum dinheiro em espécie — principalmente para a travessia de canoa e os barqueiros. Na maioria dos lugares dá para pagar com Pix e cartão." },
     { k: ["pet", "cachorro", "gato", "animal"], r: "Sobre pets, cada caso a gente conversa direitinho. Me chama no WhatsApp que te respondo rapidinho 🐾", a: "wa" },

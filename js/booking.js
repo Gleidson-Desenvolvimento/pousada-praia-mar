@@ -379,7 +379,7 @@
         <p>🔒 Você vai para o ambiente seguro do <b>Mercado Pago</b> para pagar <b>${brl(q.agora)}</b>. Lá você escolhe a forma de pagamento:</p>
         <ul class="mp-formas">
           <li>Pix, com aprovação na hora</li>
-          <li>Cartão de crédito em até ${MP.parcelasMax || 12}x${MP.parcelasSemJuros ? `, até ${MP.parcelasSemJuros}x sem juros` : ""}</li>
+          <li>Cartão de crédito em até ${MP.parcelasMax || 12}x${MP.parcelasSemJuros ? `, até ${MP.parcelasSemJuros}x sem juros` : " (parcelado com juros)"}</li>
           <li>Cartão de débito</li>
           <li>Saldo do Mercado Pago</li>
         </ul>

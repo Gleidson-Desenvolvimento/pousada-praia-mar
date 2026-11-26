@@ -47,12 +47,12 @@ window.PM_CONFIG = {
      preenchido, o hóspede paga no Mercado Pago (Pix, cartão de crédito e
      de débito, saldo Mercado Pago) e a reserva é confirmada sozinha.
      Vazio = o site usa o Pix direto e o link de cartão acima.
-     parcelasSemJuros só aparece no texto: os juros são configurados na
+     parcelasSemJuros só aparece no texto (0 = não mostra): os juros são configurados na
      conta do Mercado Pago.                                               */
   mercadoPago: {
-    funcaoUrl: "",
+    funcaoUrl: "https://pousada-praia-mar-pagamentos.pousada-praia-mar-pagamentos.workers.dev/criar",
     parcelasMax: 12,
-    parcelasSemJuros: 6,
+    parcelasSemJuros: 0, // 0 = o hóspede paga os juros de qualquer parcelamento
   },
 
   /* Percentual cobrado como sinal para garantir a reserva */
