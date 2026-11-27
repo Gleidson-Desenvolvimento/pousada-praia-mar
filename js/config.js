@@ -51,6 +51,10 @@ window.PM_CONFIG = {
      conta do Mercado Pago.                                               */
   mercadoPago: {
     funcaoUrl: "https://pousada-praia-mar-pagamentos.pousada-praia-mar-pagamentos.workers.dev/criar",
+    // Public Key de PRODUÇÃO (é pública: só identifica a conta no formulário de pagamento)
+    publicKey: "APP_USR-87d46fed-7017-478b-a8e5-71e279566e58",
+    // true = o pagamento é feito num formulário dentro do site; false = vai para a página do Mercado Pago
+    formulario: true,
     parcelasMax: 12,
     parcelasSemJuros: 0, // 0 = o hóspede paga os juros de qualquer parcelamento
   },

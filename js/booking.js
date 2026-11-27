@@ -139,7 +139,7 @@
   const fresh = () => ({
     step: 1, checkin: null, checkout: null, adultos: 2, criancas: 0, quartoId: null,
     extras: new Set(), hospede: {}, pagamento: MP ? "mp-sinal" : "pix-sinal", codigo: null, calMonth: (() => { const t = today(); return new Date(t.getFullYear(), t.getMonth(), 1); })(),
-    pixExpira: null, reserva: null, mpSituacao: null, mpCorpo: null,
+    pixExpira: null, reserva: null, mpSituacao: null, mpCorpo: null, mpForm: null, mpPix: null,
   });
   let state = fresh();
   let timerId = null;
@@ -153,9 +153,11 @@
       li.classList.toggle("done", s < state.step);
     });
     const main = $("#bkMain");
+    if (brick) desmontarBrick(false); // fecha o formulário anterior antes de redesenhar
     main.innerHTML = [null, stepDates, stepRoom, stepGuest, stepPay, stepDone][state.step]();
     main.scrollTop = 0;
     renderSummary();
+    if (state.step === 4 && state.mpForm && !state.mpPix) montarBrick();
   }
 
   /* ---------- PASSO 1: datas ---------- */
@@ -376,7 +378,7 @@
         ${payOpt("mp-integral", "Valor integral", "Pague tudo agora", brl(full.total))}
       </div>
       <div class="card-box mp-box">
-        <p>🔒 Você vai para o ambiente seguro do <b>Mercado Pago</b> para pagar <b>${brl(q.agora)}</b>. Lá você escolhe a forma de pagamento:</p>
+        <p>🔒 ${usaFormulario() ? `Na próxima tela você paga <b>${brl(q.agora)}</b> aqui mesmo, com segurança do <b>Mercado Pago</b>. Formas de pagamento:` : `Você vai para o ambiente seguro do <b>Mercado Pago</b> para pagar <b>${brl(q.agora)}</b>. Lá você escolhe a forma de pagamento:`}</p>
         <ul class="mp-formas">
           <li>Pix, com aprovação na hora</li>
           <li>Cartão de crédito em até ${MP.parcelasMax || 12}x${MP.parcelasSemJuros ? `, até ${MP.parcelasSemJuros}x sem juros` : " (parcelado com juros)"}</li>
@@ -388,10 +390,12 @@
       <p class="bk-error" id="bkErr"></p>
       <div class="bk-nav">
         <button type="button" class="btn btn--line" data-back>← Dados</button>
-        <button type="button" class="btn btn--coral btn--lg" data-finish>Ir para o pagamento →</button>
+        <button type="button" class="btn btn--coral btn--lg" data-finish>${usaFormulario() ? "Continuar para o pagamento →" : "Ir para o pagamento →"}</button>
       </div>`;
   }
   function stepPay() {
+    if (MP && state.mpPix) return telaPix();
+    if (MP && state.mpForm) return telaFormulario();
     if (MP) return stepPayMP();
     const base = quote({ ...state, pagamento: "pix-sinal" });
     const full = quote({ ...state, pagamento: "pix-total" });
@@ -524,6 +528,11 @@
       }
       Object.assign(r, { total: j.total, pagoAgora: j.agora, restante: j.restante });
       try { localStorage.setItem(MP_KEY, JSON.stringify({ r, corpo })); } catch {}
+      if (usaFormulario()) {
+        state.reserva = r; state.mpCorpo = corpo; state.mpForm = { url: j.url, preferencia: j.preferencia || null, agora: j.agora };
+        state.mpPix = null; state.mpSituacao = null;
+        return go(4);
+      }
       location.href = j.url;
     } catch (e) {
       if (btn) { btn.disabled = false; btn.textContent = rotulo; }
@@ -531,6 +540,187 @@
       if (err) err.innerHTML = `${esc(msg)} <a href="${waLink(`Olá! Tentei pagar a reserva ${r.codigo} pelo site e não consegui.`)}" target="_blank" rel="noopener">Falar com a pousada no WhatsApp</a>`;
     }
   }
+  /* ---------- Formulário de pagamento dentro do site (Payment Brick do Mercado Pago) ----------
+     O formulário é do Mercado Pago (os dados do cartão nunca passam pelo site), desenhado
+     com as cores da pousada. Pix e cartão são pagos aqui; "conta Mercado Pago" leva ao
+     Mercado Pago e volta, como antes. Se o formulário não carregar, fica o link da página. */
+  const usaFormulario = () => !!(MP && MP.publicKey && MP.formulario !== false);
+  const urlServidor = (rota) => String(MP.funcaoUrl).replace(/\/criar$/, "/" + rota);
+  let sdkMP = null, brick = null, pixTimer = null;
+  function carregarSDK() {
+    if (window.MercadoPago) return Promise.resolve();
+    if (!sdkMP) sdkMP = new Promise((ok, falha) => {
+      const s = document.createElement("script");
+      s.src = "https://sdk.mercadopago.com/js/v2"; s.onload = ok; s.onerror = () => { sdkMP = null; falha(new Error("sdk")); };
+      document.head.appendChild(s);
+    });
+    return sdkMP;
+  }
+  function desmontarBrick(tudo = true) {
+    if (tudo) { clearInterval(pixTimer); pixTimer = null; }
+    try { brick?.unmount(); } catch {}
+    brick = null;
+  }
+  function telaFormulario() {
+    const r = state.reserva, f = state.mpForm;
+    return `
+      <p class="bk-title">Pagamento</p>
+      <p class="bk-sub">Reserva nº <b>${esc(r.codigo)}</b> · ${r.pagamento === "mp-integral" ? "valor integral" : `sinal de ${Math.round(C.sinal * 100)}%`}: <b>${brl(f.agora)}</b></p>
+      <div id="mpBrick" class="mp-brick"><p class="mp-carregando">Carregando o pagamento seguro…</p></div>
+      <p class="bk-error" id="bkErr"></p>
+      <p class="mp-alternativa">Prefere pagar na página do Mercado Pago? <a href="${esc(f.url)}" data-mp-pagina>Abrir o Mercado Pago</a></p>
+      <div class="bk-nav">
+        <button type="button" class="btn btn--line" data-back>← Voltar</button>
+        <span class="mp-selo">🔒 Pagamento seguro · Mercado Pago</span>
+      </div>`;
+  }
+  async function montarBrick() {
+    const f = state.mpForm, r = state.reserva;
+    if (!f || brick || !$("#mpBrick")) return;
+    const falhou = () => {
+      const box = $("#mpBrick");
+      if (box && state.mpForm === f) box.innerHTML = `<div class="card-box"><p>Não foi possível carregar o pagamento aqui. Você pode pagar com segurança na página do Mercado Pago:</p><a class="btn btn--anil" href="${esc(f.url)}" data-mp-pagina>Pagar no Mercado Pago →</a></div>`;
+    };
+    // se o formulário não ficar pronto em 15 s (sem internet, conta sem permissão...), oferece a página do Mercado Pago
+    let pronto = false;
+    const vigia = setTimeout(() => { if (!pronto && state.mpForm === f) { desmontarBrick(false); falhou(); } }, 15000);
+    try {
+      await carregarSDK();
+      if (state.mpForm !== f || !$("#mpBrick")) return clearTimeout(vigia); // saiu da tela enquanto carregava
+      const mp = new window.MercadoPago(MP.publicKey, { locale: "pt-BR" });
+      const [nome, ...resto] = String(r.hospede?.nome || "").split(/\s+/);
+      brick = await mp.bricks().create("payment", "mpBrick", {
+        initialization: {
+          amount: f.agora,
+          ...(f.preferencia ? { preferenceId: f.preferencia } : {}),
+          payer: { email: r.hospede?.email || "", firstName: nome || "", lastName: resto.join(" ") },
+        },
+        customization: {
+          visual: {
+            style: {
+              theme: "default",
+              customVariables: {
+                baseColor: "#34409a", baseColorFirstVariant: "#1f2660", baseColorSecondVariant: "#151a45",
+                textPrimaryColor: "#23203a", textSecondaryColor: "#7a6e5d", formBackgroundColor: "#ffffff",
+                inputBackgroundColor: "#ffffff", outlinePrimaryColor: "#e3d5bb", outlineSecondaryColor: "#e3d5bb",
+                buttonTextColor: "#ffffff", errorColor: "#c4452b", successColor: "#2e7d4f",
+                borderRadiusSmall: "8px", borderRadiusMedium: "12px", borderRadiusLarge: "16px", formPadding: "18px",
+              },
+            },
+            texts: { formSubmit: `Pagar ${brl(f.agora)}` },
+          },
+          paymentMethods: {
+            bankTransfer: "all", creditCard: "all", debitCard: "all",
+            ...(f.preferencia ? { mercadoPago: "all" } : {}),
+            maxInstallments: MP.parcelasMax || 12,
+          },
+        },
+        callbacks: {
+          onReady: () => { pronto = true; clearTimeout(vigia); $("#mpBrick .mp-carregando")?.remove(); },
+          onSubmit: ({ selectedPaymentMethod, formData }) => {
+            // conta Mercado Pago: o próprio formulário leva ao Mercado Pago e o hóspede volta ao site
+            if (selectedPaymentMethod === "wallet_purchase" || !formData) return Promise.resolve();
+            return enviarPagamento(formData);
+          },
+          onError: (e) => { console.warn("Formulário do Mercado Pago:", e); if (!pronto || e?.type === "critical") { clearTimeout(vigia); desmontarBrick(false); falhou(); } },
+        },
+      });
+    } catch (e) {
+      console.warn("Formulário do Mercado Pago não carregou:", e);
+      clearTimeout(vigia); brick = null; falhou();
+    }
+  }
+  async function enviarPagamento(formData) {
+    const r = state.reserva, err = $("#bkErr");
+    if (err) err.textContent = "";
+    let j;
+    try {
+      const res = await fetch(urlServidor("pagar"), {
+        method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(40000),
+        body: JSON.stringify({ codigo: r.codigo, formData, tentativa: genCode() + Date.now().toString(36) }),
+      });
+      j = await res.json().catch(() => ({}));
+      if (res.status === 409 && j.situacao) { setTimeout(() => concluirMP("aprovado"), 0); return; } // já estava paga
+      if (!res.ok) throw new Error(j.erro || "Não foi possível processar o pagamento agora.");
+    } catch (e) {
+      if (err) err.textContent = e.name === "TimeoutError" ? "O pagamento demorou para responder. Confira seu e-mail ou o app do banco antes de tentar de novo." : e.message;
+      throw e; // o formulário libera o botão para tentar de novo
+    }
+    // troca de tela depois que o formulário terminar o envio
+    if (j.status === "approved") { setTimeout(() => concluirMP("aprovado"), 0); return; }
+    if (j.pix && j.pix.codigo) {
+      setTimeout(() => { desmontarBrick(); state.mpPix = { ...j.pix, id: j.id }; render(); acompanharPix(); }, 0);
+      return;
+    }
+    if (j.status === "in_process" || j.status === "pending" || j.status === "authorized") { setTimeout(() => concluirMP("pendente"), 0); return; }
+    if (err) err.textContent = j.mensagem || "O pagamento não foi aprovado. Tente outro cartão ou pague com Pix.";
+    throw new Error("recusado");
+  }
+  function telaPix() {
+    const r = state.reserva, x = state.mpPix;
+    return `
+      <p class="bk-title">Pague com Pix</p>
+      <p class="bk-sub">Reserva nº <b>${esc(r.codigo)}</b> · ${brl(r.pagoAgora)}</p>
+      <div class="pix-box">
+        <div class="pix-qr">${x.imagem ? `<img src="data:image/png;base64,${x.imagem}" alt="QR Code do Pix" />` : "<p>Use o código copia e cola.</p>"}</div>
+        <div>
+          <p class="subhead" style="margin:0">Pague ${brl(r.pagoAgora)} com Pix</p>
+          <span class="timer" id="pixTimer">⏱ calculando o prazo…</span>
+          <div class="pix-code"><input id="pixCode" readonly value="${esc(x.codigo)}" aria-label="Pix copia e cola" /><button type="button" class="btn btn--anil" data-copy>Copiar</button></div>
+          <ol class="pix-steps">
+            <li>Abra o app do seu banco e escolha <b>Pix → Ler QR Code</b> ou <b>Copia e cola</b>.</li>
+            <li>Confira o recebedor: <b>Praia Mar Pousada</b>.</li>
+            <li>Pague. <b>Esta tela confirma sozinha</b> quando o Pix cair.</li>
+          </ol>
+          <p class="mp-aguardando" id="pixSituacao">● Aguardando o pagamento…</p>
+        </div>
+      </div>
+      <p class="bk-error" id="bkErr"></p>
+      <div class="bk-nav">
+        <button type="button" class="btn btn--line" data-pix-voltar>← Pagar de outro jeito</button>
+        <span class="mp-selo">🔒 Pagamento seguro · Mercado Pago</span>
+      </div>`;
+  }
+  function acompanharPix() {
+    clearInterval(pixTimer);
+    const x = state.mpPix, codigo = state.reserva.codigo;
+    const expira = Date.parse(x.expira || 0) || Date.now() + 30 * 60000;
+    let consultas = 0;
+    const tick = async () => {
+      if (state.mpPix !== x) return clearInterval(pixTimer);
+      const falta = Math.max(0, expira - Date.now());
+      const el = $("#pixTimer");
+      if (el) el.textContent = falta ? `⏱ ${pad(Math.floor(falta / 60000))}:${pad(Math.floor((falta % 60000) / 1000))} para pagar` : "⏱ O prazo do Pix acabou";
+      if (++consultas % 4 !== 1) return; // consulta o servidor a cada 4 segundos
+      try {
+        const res = await fetch(`${urlServidor("situacao")}?codigo=${encodeURIComponent(codigo)}`, { cache: "no-store" });
+        const j = await res.json();
+        if (j.situacao === "pago") { clearInterval(pixTimer); return concluirMP("aprovado"); }
+      } catch {}
+      if (!falta) {
+        clearInterval(pixTimer);
+        const s = $("#pixSituacao");
+        if (s) s.innerHTML = `O prazo deste Pix acabou. <a href="#" data-pix-voltar>Gerar um novo pagamento</a>`;
+      }
+    };
+    tick();
+    pixTimer = setInterval(tick, 1000);
+  }
+  function concluirMP(sit) {
+    desmontarBrick();
+    const r = state.reserva;
+    if (sit === "aprovado") {
+      r.status = "pago";
+      const list = loadStored().filter((x) => x.codigo !== r.codigo);
+      list.push(r);
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); localStorage.removeItem(MP_KEY); } catch {}
+    }
+    state.mpForm = null; state.mpPix = null; state.mpSituacao = sit;
+    go(5);
+  }
+  // para os testes automáticos do site
+  window.__PMPagamento = { enviarPagamento: (fd) => enviarPagamento(fd) };
+
   function pagarMP(r) {
     const corpo = {
       codigo: r.codigo, quarto: r.quarto, inicio: r.inicio, fim: r.fim, adultos: r.adultos, criancas: r.criancas,
@@ -796,7 +986,9 @@
           );
           return;
         }
-        if (e.target.closest("[data-back]")) { clearInterval(timerId); return go(3); }
+        if (e.target.closest("[data-mp-pagina]")) { try { localStorage.setItem(MP_KEY, JSON.stringify({ r: state.reserva, corpo: state.mpCorpo })); } catch {} return; }
+        if (e.target.closest("[data-pix-voltar]")) { e.preventDefault(); desmontarBrick(); state.mpPix = null; state.mpForm = null; return render(); }
+        if (e.target.closest("[data-back]")) { clearInterval(timerId); if (state.mpForm) { desmontarBrick(); state.mpForm = null; return render(); } return go(3); }
         if (e.target.closest("[data-finish]")) finish();
     } },
     5: { click(e) {
@@ -829,6 +1021,7 @@
     modal().hidden = true;
     document.body.classList.remove("lock");
     clearInterval(timerId);
+    desmontarBrick();
     if (state.step === 5) state = fresh();
     lastFocus?.focus?.();
   }
