@@ -28,11 +28,13 @@
   async function atualizar() {
     if (!PROJETO) return;
     try {
-      const res = await fetch(`https://firestore.googleapis.com/v1/projects/${PROJETO}/databases/(default)/documents/publico/ocupacao`, { cache: "no-store", signal: AbortSignal.timeout(5000) });
-      if (!res.ok) return;
-      const doc = await res.json();
+      const base = `https://firestore.googleapis.com/v1/projects/${PROJETO}/databases/(default)/documents/publico/`;
+      const ler = (doc) => fetch(base + doc, { cache: "no-store", signal: AbortSignal.timeout(5000) }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+      const [doc, ext] = await Promise.all([ler("ocupacao"), ler("externo")]); // externo = datas do Booking
+      if (!doc) return;
       const ocupado = dec({ mapValue: { fields: doc.fields || {} } }).ocupado || [];
-      O.lista = ocupado.filter((o) => o && o.quarto && /^\d{4}-\d{2}-\d{2}$/.test(o.inicio) && /^\d{4}-\d{2}-\d{2}$/.test(o.fim));
+      const externo = ext ? dec({ mapValue: { fields: ext.fields || {} } }).bloqueios || [] : [];
+      O.lista = [...ocupado, ...externo].filter((o) => o && o.quarto && /^\d{4}-\d{2}-\d{2}$/.test(o.inicio) && /^\d{4}-\d{2}-\d{2}$/.test(o.fim));
       document.dispatchEvent(new CustomEvent("pm:ocupacao"));
     } catch (e) { /* sem rede: fica com o que já tinha */ }
   }
